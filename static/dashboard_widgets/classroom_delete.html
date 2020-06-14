@@ -1,0 +1,7 @@
+<h4>Delete a class</h4>
+<select styled-select ng-options="c.id as c.name for c in classroomList"
+        ng-model="classroomId">
+</select>
+<button ng-click="deleteClassroom()" ng-disabled="!classroomId">
+    delete
+</button>

@@ -1,0 +1,30 @@
+<fieldset>
+    <legend>Create School</legend>
+    <form id="create_school" onsubmit="return false;">
+        <label for="create_school__name">name</label>
+        <input id="create_school__name">
+        <button>submit</button>
+    </form>
+    <script type="text/javascript">
+
+$('#create_school button').click(function () {
+    'use strict';
+    var name = $('#create_school__name').val();
+    $.ajax('/api/put/school', {
+        dataType: 'json',
+        data: {name: name},
+        success: function (response) {
+            $('#create_school').append(
+                '<span>Will refresh in 1 second to reload school list.</span>'
+            );
+            setTimeout(function () {
+                // true means don't just reload from cache
+                window.location.reload(true);
+            }, 1000);
+        }
+    });
+});
+
+    </script>
+</fieldset>
+<div school-entry-list></div>

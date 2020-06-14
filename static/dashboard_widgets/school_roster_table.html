@@ -1,0 +1,97 @@
+
+<!-- <pre>watchers: [[ watchers ]]</pre>
+<button ng-click="wcount()">count</button>
+ -->
+<table class="dashboard-table roster_summary">
+    <colgroup>
+        <col ng-repeat="col in summaryColumns" class="[[col.colClass]]" span="1">
+    </colgroup>
+    <thead>
+        <!-- This first row is essentially categories of columns. The colX
+        classes allow us to apply borders only on certain columns. -->
+        <tr>
+            <th colspan="1" class="col0" style="color:black">Summary</th>
+            <th colspan="2" class="col1 col2">Total Students</th>
+            <th colspan="2" class="col3 col4">Certified Students</th>
+            <th colspan="4" class="col5 col6 col7 col8">Study Eligible</th>
+        </tr>
+        <tr>
+            <th ng-repeat="col in summaryColumns" class="[['col' + $index]]"
+                tooltip="[[col.tooltip]]">
+                [[ col.name ]]
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- HP17 runs B and C have only 1 session -->
+        <!--<tr ng-repeat="o in [1, 2]">-->
+        <tr ng-repeat="o in [1]">
+            <td class="col0">Session [[ o ]]</td>
+            <td class="col1">[[ summary[o].uncertified ]]</td>
+            <td class="col2">[[ summary[o].certified ]]</td>
+            <td class="col3">[[ summary[o].studyIneligible ]]</td>
+            <td class="col4">[[ summary[o].studyEligible ]]</td>
+            <td class="col5">[[ summary[o].completed ]]</td>
+            <td class="col6">[[ summary[o].makeupIneligible ]]</td>
+            <td class="col7">[[ summary[o].makeupEligible ]]</td>
+            <td class="col8">[[ summary[o].uncoded ]]</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr></hr>
+
+<div class="row dashboard-table-controls">
+    <div class="span12">
+
+        <input type="text" ng-model="searchText" placeholder="Search...">
+
+        <span ng-show="$root.level == 'classroom'">
+            <select chosen-select
+                    data-placeholder="Move student(s) to..."
+                    select-options="destinationClassrooms"
+                    ng-options="c as c.name for c in destinationClassrooms"
+                    ng-model="moveToClassroom"
+                    ng-disabled="selectedList.length == 0 || destinationClassrooms.length == 0">
+                <!-- Empty option tag works around bug in chosen plugin. -->
+                <!-- http://stackoverflow.com/questions/19369250/uncaught-typeerror-cannot-set-property-selected-of-undefined -->
+                <option value=""></option>
+            </select>
+        </span>
+        <button class="icon_button" ng-disabled="selectedList.length == 0"
+                ng-confirm
+                ng-confirm-message="'Are you sure you want to delete these ' + selectedList.length + ' users?'"
+                ng-confirm-click="deleteSelectedUsers()">
+            <i class="icon-trash"></i>
+        </button>
+    </div>
+</div>
+
+<table class="dashboard-table roster_table">
+    <colgroup>
+        <col ng-repeat="col in columns" class="[[col.colClass]]" span="1">
+    </colgroup>
+    <thead>
+        <tr ng-class="{'reverse-sort': reverseSort}">
+            <th bindonce ng-repeat="col in columns" ng-click="sortBy($index)"
+                ng-class="{'sorting-active': $index == sortedColumn, sortable: col.sortable}">
+                [[ col.name ]]
+                <div bo-if="col.colClass == 'select'">
+                    <input type="checkbox"
+                           ng-model="allSelected"
+                           ng-change="toggleSelectAll(allSelected)">
+                </div>
+            </th>
+        </tr>
+    </thead>
+    <tbody ng-repeat="user in pageList" school-roster-row
+           is-pinned="false" user-id="[[ user.id ]]"
+           classroom="classroom">
+    </tbody>
+</table>
+
+<div class="empty-table-hint" ng-show="searchList.length == 0">
+    [[ emptyTableMessage ]]
+</div>
+
+<div table-page-nav></div>

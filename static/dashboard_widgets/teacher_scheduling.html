@@ -1,0 +1,24 @@
+<table class="teacher_progress">
+    <colgroup>
+        <col span="1" class="entity" ng-show="userType=='student'">
+        <col span="1" class="activity">
+        <col span="1" class="date">
+    </colgroup>
+    <thead>
+        <tr>
+            <th ng-show="userType=='student'">Class</th>
+            <th>Activity</th>
+            <th>Start Date</th>
+        </tr>
+    </thead>
+
+    <!-- If this widget is displaying teacher activities, don't show any
+         activities until their condition is known. This should prevent control
+         teachers from ever seeing all five activity widgets and getting
+         confused. -->
+    <tbody ng-hide="userType=='teacher' && !$root.conditionPd">
+        <tr ng-repeat="activity in activityList | orderBy:['assc_classroom_list[0]','activity_ordinal']"
+            activity-progress show-progress="false"
+            activity-id="[[ activity.id ]]"></tr>
+    </tbody>
+</table>

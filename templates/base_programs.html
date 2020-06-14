@@ -1,0 +1,388 @@
+{# Ancestor of all program apps. #}
+
+{# Inheriting templates may extend: #}
+{# program_header - for js and css stuff #}
+{# program_content - for content, obviously #}
+
+{# Inheriting templates MAY NOT extend the normal header and content blocks. #}
+
+{% extends "templates/base.html" %}
+
+{% block header %}
+
+    {% block base_programs_header %}
+    <!-- styles for all program apps -->
+    <link rel="stylesheet" href="/static/css/programs.css">
+
+        {% if is_localhost %}
+
+    <!--
+        hashchange is a standard html5 event, but it is not supported by
+        ie7 or ie8 (in some modes); the following js fixes that. Note that
+        cam has modified the file slightly from its original version so it
+        works with the current release of jquery.
+        http://benalman.com/projects/jquery-hashchange-plugin/
+    -->
+    <script src="/static/js/hashchange.js"></script>
+    <script src="/static/js/programs.js"></script>
+    <script src="/static/js/gplus-youtubeembed.js"></script>
+
+        {% else %}
+
+    <script src="/static/js/dist/programs.min.js"></script>
+
+        {% endif %}
+
+    <script>
+
+var programId = '{{ program_id }}';
+var programAbbreviation = '{{ program_abbreviation }}';
+var cohortId = '{{ cohort_id }}';
+// When the classroom parameter isn't present (e.g. for the teacher subprogram)
+// the server will return empty string. It makes more sense in the javascript
+// paradigm for this to be undefined (because it's not defined!).
+var classroomId = '{{ classroom_id }}' || undefined;
+// This isn't just the user type of the currently logged in user, it's the
+// the subprogram being viewed, sourced from the URL. For example, if we are
+// at /p/TP1/student then this is the 'student' subprogram.
+var subprogram = '{{ template_name }}';
+var synchronization = true;
+var serverDateTime = Date.createFromString('{{ server_date_time }}', 'UTC');
+var configJson = {{ config_json|safe }};
+
+var statusCodes = {
+    1: '{{ user.s1_status_code if user.s1_status_code }}' || undefined,
+    2: '{{ user.s2_status_code if user.s2_status_code }}' || undefined
+};
+
+var statusCodeInfo = {{ config.status_codes|tojson|safe }};
+
+var defaultQualtricsLinks = {{ config.default_qualtrics_links | tojson | safe }};
+
+    </script>
+    {% endblock %}
+
+    {% block program_header %}
+    {% endblock %}
+
+{% endblock %}
+
+{% block godbar %}
+
+<script type="text/javascript">
+
+function GodBarController($scope, $modal, $window) {
+    'use strict';
+
+    $scope.showAll = 0;  // just tracks the button's state
+
+    //  automatically run the check and make it obvious if things are broken
+    angular.element($window).bind('load', function() {
+        $scope.testVariables();
+    });
+
+    $scope.toggleShowAll = function () {
+        // Connect to the ProgramController and flip the switch
+        var s = window.getScope();
+        s.showAll = !s.showAll;
+    };
+
+    $scope.setCondition = function () {
+        var s = window.getScope();
+        s.pd.condition = prompt("Condition is currently '" + s.pd.condition +
+                                "'. Set to what?");
+        s.synchronize();
+    }
+
+    $scope.toggleActivityOverride = function () {
+        if (queryString('activity_override') === 'true') {
+            queryString('activity_override', 'false');
+        } else {
+            queryString('activity_override', 'true');
+        }
+    };
+
+    var testingDialogMarkup = '' +
+        '<div class="modal-header">'+
+            '<h3>Testing Options</h3>'+
+        '</div>'+
+        '<div class="modal-body">'+
+            '<p>' +
+                'Module: ' +
+                '<select styled-select ng-model="testing.moduleId" ' +
+                        'ng-options="m.id as m.id for m in outline">' +
+                '</select>' +
+            '</p>' +
+            '<p>' +
+                'Runs: ' +
+                '<input type="number" min="1" ng-model="testing.runs">' +
+            '</p>' +
+            '<p>' +
+                'Make calls to server? ' +
+                '<div class="btn-group">' +
+                    '<button type="button" class="btn btn-primary" ng-model="testing.makeCalls" btn-radio="true">Yes</button>' +
+                    '<button type="button" class="btn btn-primary" ng-model="testing.makeCalls" btn-radio="false">No</button>' +
+                '</div>' +
+            '</p>'+
+        '</div>'+
+        '<div class="modal-footer">'+
+            '<button ng-click="close(testing)" class="btn btn-primary">' +
+                'Test' +
+            '</button>' +
+            '<button ng-click="close()" class="btn">' +
+                'Close' +
+            '</button>' +
+        '</div>';
+
+    $scope.openDialog = function () {
+        var modalInstance = $modal.open({
+            backdrop: true,
+            keyboard: true,
+            backdropClick: true,
+            backdropFade: true,
+            template:  testingDialogMarkup,
+            controller: 'TestDialogController'
+        });
+        modalInstance.result.then(function (result) {
+            if (result) {
+                // then a test was requested, so send testing settings to the
+                // ProgramController
+                var s = window.getScope();
+                forEach(result, function (k, v) {
+                    s.testing[k] = v;
+                });
+                // and initiate the test
+                s.testModule();
+            }
+        });
+    };
+
+
+    //  defining variable entry class
+    $scope.variableEntry = function(ngModelName){
+        this.ngModelName = ngModelName;
+        this.tagNames = [];
+        this.values = [];
+        this.indexes = [];
+    };
+
+    //  setup functions
+    $scope.variableEntry.prototype.addIndex = function(i){
+        this.indexes.push(i);
+    };
+    $scope.variableEntry.prototype.addTagName = function(tagName){
+        this.tagNames.push(tagName);
+    };
+    $scope.variableEntry.prototype.addValue = function(value){
+        this.values.push(value);
+    };
+
+    // variable entry reporting functions
+    $scope.variableEntry.prototype.getNgModelName = function(){
+        return this.ngModelName;
+    };
+    $scope.variableEntry.prototype.firstIndex = function(){
+        return this.indexes[0];
+    };
+    $scope.variableEntry.prototype.likelyDuplicate = function(){
+        return this.indexes.length > $.unique(this.values).length;
+    };
+    $scope.variableEntry.prototype.namesMatch = function(){
+        return $.unique(this.tagNames).length == 1 && this.ngModelName == this.tagNames[0];
+    };
+    $scope.variableEntry.prototype.getValues = function(){
+        return this.values.sort()
+    };
+
+    $scope.testVariables = function () {
+        if (!window.getScope()) {
+            // Then this isn't really the program app (might be a student
+            // orientation page, for example) and this function shouldn't be
+            // run as it will only throw errors.
+            return;
+        }
+        var variables = window.getScope().testing.variableResults;
+        var problemDetected = false;
+        angular.element('[ng-model]').each( function(i,el){ 
+            var varName = $(el).attr("ng-model");
+            var loopVar;
+            if( variables[varName] ){
+                loopVar = variables[varName];
+            } else{
+                loopVar = new $scope.variableEntry(varName);
+            }
+            loopVar.addTagName(el.name);
+            loopVar.addValue($(el).attr("ng-value"));
+            loopVar.addIndex(i);
+            if( loopVar.likelyDuplicate() || ! loopVar.namesMatch() ){
+                problemDetected = true;
+            }
+            variables[varName] = loopVar;
+        } )
+        if( problemDetected ){
+            $('#show_variables_button').css({'color':'red', 'font-weight': 'bold'});
+            $('.admin-control').css('display','block');
+        }
+    };
+
+    $scope.showVariables = function () {
+        angular.element('#variable_integrity_readout').toggle()
+    };
+
+    $scope.orderedVariables = function(){
+        var variables = window.getScope().testing.variableResults;
+        var orderedAr = [];
+        angular.each(variables, function(i,el){
+            orderedAr[ el.firstIndex() ] = el;
+        })
+        return orderedAr;
+    }
+
+}
+
+function TestDialogController($scope, $modalInstance) {
+    $scope.outline = window.configJson.outline;
+
+    $scope.testing = {
+        moduleId: '',
+        runs: 20,
+        makeCalls: false
+    }
+
+    $scope.close = function (result) {
+        $modalInstance.close(result);
+    };
+
+}
+
+</script>
+
+<div ng-controller="GodBarController" style="margin-left: 10px" class="align-left">
+    <nav class="dropdown">
+        <ul>
+            <li><span>Editing&nbsp;<i class="icon-angle-down"></i></span>
+                <ul>
+                    <li>
+                        <span ng-click="toggleShowAll()">
+                            show all
+                        </span>
+                    </li>
+                    <li>
+                        <span id="show_variables_button" ng-click="showVariables()">
+                            show variables
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <a href="/api/preview_reminders/{{program_abbreviation}}/{{template_name}}/" target="_blank">
+                                preview reminders
+                            </a>
+                        </span>
+                    </li>
+                    <li>
+                        <span onClick='window.open("http://simpleenglishchecker.appspot.com/","_blank");'>
+                            find hard words
+                        </span>
+                    </li>
+                </ul>
+            </li>
+            <li><span>Testing&nbsp;<i class="icon-angle-down"></i></span>
+                <ul>
+                    <li><span ng-click="toggleActivityOverride()">activity override</span></li>
+                    <li><span ng-click="setCondition()">set condition</span></li>
+                    <li><span ng-click="openDialog()">test paths</span></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</div>
+{% endblock %}    
+
+{% block content %}
+    
+    <div id="appController" ng-controller="ProgramController" ng-init="onPageLoad()">
+
+        {% block program_content %}
+        {% endblock %}
+
+        {% block base_programs_content %}
+        <div id="program_navigation" ng-show="activePage">
+            <div class="one-third">&nbsp;</div>
+            <div class="one-third">
+                <p>
+                    <span class="nav_link previous button"
+                          ng-click="previousButton()"
+                          ng-show="showPreviousButton()">
+                        <i class="icon-chevron-left"></i>&nbsp;&nbsp;prev
+                    </span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="nav_link next button"
+                          ng-click="nextButton()"
+                          ng-show="showNextButton()">
+                        next&nbsp;&nbsp;<i class="icon-chevron-right"></i>
+                    </span>
+               </p>
+            </div>
+            <div class="one-third last">&nbsp;</div>
+        </div>
+
+        {# allow gods to view program data #}
+        {% if normal_user.user_type in ['god','researcher'] %}
+        <hr>
+        <pre class="admin-control" id="data_view"> [[ pd | json:'  ' ]]</pre>
+        <div class="admin-control container">
+            <h3 ng-show="testing.pathResults.length > 0">Test Paths:</h3>
+            <div class="one-third" ng-repeat="r in testing.pathResults">
+                Path #[[ $index + 1]]
+                <pre >
+                    [[ r | json:'  ' ]]
+                </pre>
+            </div>
+            <div id="variable_integrity_readout">
+                <h3>Variables:</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>
+                                Model Name
+                            </th>
+                            <th>
+                                Duplicated
+                            </th>
+                            <th>
+                                Tag Names Match
+                            </th>
+                            <th>
+                                Values
+                            </th>
+                        </tr>
+                        <tr ng-repeat="v in testing.variableResults">
+                            <td>
+                                [[ v.ngModelName ]]
+                            </td>
+                            <td>
+                                [[ v.likelyDuplicate() ]]
+                            </td>
+                            <td>
+                                [[ v.namesMatch() ]]
+                            </td>
+                            <td>
+                                [[ v.getValues() ]]
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endblock %}
+
+    </div>
+
+    <script type="text/javascript">optimizeYouTubeEmbeds()</script>
+
+{% endblock %}    
+
+
+

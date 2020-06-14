@@ -1,0 +1,391 @@
+{# Sign in for everyone but students. #}
+
+{% extends "base.html" %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block header %}
+
+<style>
+
+.invisible {
+    visibility: hidden;
+}
+
+#loginContainer #google_button {
+    margin: 0;
+    padding: 7px 12px 12px 12px;
+    height: 84px;
+    width: 60px;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    font-size: 1em;
+}
+
+#google_button a {
+}
+
+#loginContainer h4 {
+    margin: 10px 0;
+    height: 20px;
+}
+
+#loginContainer label {
+    margin: 10px 0;
+    height: 20px;
+}
+
+#loginContainer input {
+    margin: 0;
+    /* overall height of input should match buttons */
+    /* bootstrap gives inputs 4px top and bottom padding, and 1px top and bottom border */
+    height: 25px;
+}
+
+#loginContainer button {
+    margin: 0;
+    height: 35px;
+}
+
+#loginContainer a {
+    text-decoration: underline;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
+#loginContainer p.success {
+    height: 53px;
+}
+
+hr {
+    margin: 25px 0 25px 0;
+}
+
+.btn img {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    margin: 0px;
+}
+
+form.ng-valid-email i.email, form.ng-valid-pattern i.password {
+    display: none;
+}
+
+</style>
+
+<script>
+var programId = '{{ program_id if program_id else '' }}';
+
+{% if error_message %}
+
+displayUserMessage('error', '{{ error_message|safe }}');
+
+{% elif success_message %}
+
+displayUserMessage('success', '{{ success_message|safe }}');
+
+{% endif %}
+
+function redirectToGoogleLogin(email) {
+    alert("Next time, use your Google account (" + email + ") to sign in.");
+    window.location.href = '{{google_login_url|safe}}';
+}
+
+function LoginController($scope, $pertsAjax, $window) {
+    $scope.emailBlurred = false;
+    $scope.loginAttempted = false;
+    $scope.requestedPassword = false;
+    $scope.emailSent = false;
+    $scope.emailNotSent = false;
+    $scope.signIn = function () {
+        $scope.invalidCredentials = false;
+        $scope.emailSent = false;
+        $scope.emailNotSent = false;
+        $pertsAjax({
+            url: '/api/login',
+            method: 'POST',
+            params: {
+                username: $scope.username,
+                password: $scope.password,
+                auth_type: 'direct'
+            }
+        }).then(function (response) {
+            if (response === 'invalid_credentials') {
+                $scope.invalidCredentials = true;
+                $scope.loginAttempted = true;
+            } else if (response === 'wrong_auth_type google') {
+                $scope.loginAttempted = true;
+                redirectToGoogleLogin($scope.username);
+            } else if (response === 'signed_in') {
+                $window.location.reload();
+            }
+        });
+    };
+    $scope.forgotPassword = function () {
+        $scope.emailSent = false;
+        $scope.emailNotSent = false;
+        $pertsAjax({
+            url: '/api/forgot_password',
+            params: {email: $scope.username}
+        }).then(function (response) {
+            // @todo 'sent' or 'not_sent' ??
+            $scope.invalidCredentials = false;
+            $scope.loginAttempted = false;
+            if (response === 'sent') {
+                $scope.emailSent = true;
+            } else if (response === 'not_sent') {
+                $scope.emailNotSent = true;
+            }
+        });
+    };
+}
+
+function RegisterController($scope, $pertsAjax, $window) {
+    $scope.emailBlurred = false;
+    $scope.passwordBlurred = false;
+    $scope.remindGmailUser = false;
+    $scope.register = function () {
+        $pertsAjax({
+            url: '/api/register',
+            method: 'POST',
+            params: {
+                username: $scope.username,
+                password: $scope.password,
+                auth_type: 'direct'
+            }
+        }).then(function (response) {
+            if (response === 'wrong_auth_type') {
+                redirectToGoogleLogin($scope.username);
+            } else {
+                var user = response.user;
+                if (user.registration_complete ||
+                    arrayContains(['god', 'researcher'], user.user_type)) {
+                    // trigger redirect as currently written in URL
+                    $window.location.reload();
+                } else {
+                    // go to registration survey
+                    var url = '/registration_survey?';
+                    if (response.user_is_new) {
+                        url += 'registration_email_sent=true&';
+                    }
+                    if ($window.programId) {
+                        url += 'program=' + $window.programId;
+                    }
+                    $window.location.href = url;
+                }
+            }
+        });
+    };
+    $scope.$watch('username', function (username) {
+        if (/@gmail\.com/.exec(username)) {
+            $scope.remindGmailUser = true;
+        }
+    });
+}
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container" id="loginContainer">
+
+    {% if program_name %}
+    <h1>You're signing up for {{ program_name }}.</h1>
+    {% else %}
+    <h1>Please sign in</h1>
+    {% endif %}
+
+    <hr>
+
+    {% if show_google_login %}
+
+    <div class="row" ng-hide>
+        <div class="span5">
+
+            {% if show_registration %}
+            <h4>Sign up with your Google account.</h4>
+            {% else %}
+            <h4>Log in with your Google account.</h4>
+            {% endif %}
+
+        </div>
+        <div class="span6">
+            <a class="button" id="google_button" href="{{google_login_url}}">
+                sign in<br>
+                <img class="google_button" src="/static/images/google_128.png" style="display:inline-block">
+            </a>
+        </div>
+    </div>
+
+    <hr>
+
+    {% endif %}
+
+    {% if not show_registration %}
+    
+    <div class="row" ng-controller="LoginController">
+        <div class="span5">
+            <h4>Log in with your email address.</h4>
+            <p class="error" ng-show="invalidCredentials">
+                Email or password not recognized.
+            </p>
+            <p class="success" ng-show="emailSent">
+                We have sent you an email to reset your password.
+            </p>
+            <p class="error" ng-show="emailNotSent">
+                We have no record of that email address.
+            </p>
+        </div>
+        <div class="span6">
+            <!-- Angular doesn't play well with browsers who pre-fill forms when using 
+                 autocompleted fields; we're putting 'autocomplete="off"' to avoid 
+                 issues that arise when autocomplete fills out a form. [1]
+                 [1]: https://github.com/angular/angular.js/issues/1460 -->
+            <form name="loginForm" autocomplete="off">
+                <label for="login_username">
+                    email
+                    <span ng-show="emailInvalid"></span>
+                </label>
+                <input id="login_username" type="email" ng-model="username"
+                       name="login_username" ng-blur="emailBlurred=true"
+                       required>
+                <i class="icon-warning-sign email"
+                   ng-show="emailBlurred && loginForm.login_username.$invalid">
+                    invalid email address
+                </i>
+                <label ng-hide="requestedPassword" for="login_password">password</label>
+                <label ng-show="requestedPassword">&nbsp;</label>
+                <input ng-hide="requestedPassword" id="login_password" type="password" ng-model="password" required>
+                <a ng-hide="requestedPassword" ng-click="requestedPassword=true">I forgot my password</a>
+                <!-- empty label used rather than <br> b/c it's easier to
+                control height -->
+                <label ng-hide="requestedPassword">&nbsp;</label>
+                <button ng-click="signIn()"
+                        ng-hide="requestedPassword"
+                        ng-disabled="loginForm.$invalid">
+                    sign in
+                </button>
+                <button ng-show="requestedPassword"
+                        ng-click="forgotPassword()"
+                        ng-disabled="!requestedPassword || loginForm.login_username.$invalid">
+                    reset my password
+                </button>
+                <a ng-show="requestedPassword" ng-click="requestedPassword=false">cancel</a>
+                <input type="hidden" ng-model="page_action" value="login">
+                <input type="hidden" ng-model="auth_type" value="direct">
+            </form>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+    <hr>
+
+    {% endif %}
+
+    {% if program_id %}
+
+    <div class="row" ng-controller="RegisterController">
+        <div class="span5">
+            <h4>Sign up with your email address.</h4>
+            <p class="error" ng-show="remindGmailUser">
+                If you have a google account, please sign in with Google above.
+            </p>
+        </div>
+        <div class="span6">
+            <form name="registerForm">
+                <label for="register_username">email</label>
+                <input id="register_username" type="email" ng-model="username" 
+                       name="register_username" required
+                       ng-blur="emailBlurred=true">
+                <i class="icon-warning-sign email"
+                   ng-show="emailBlurred && registerForm.register_username.$invalid">
+                    invalid email address
+                </i>
+                <label for="register_password">password</label>
+                <!-- at least 8 characters, ascii only -->
+                <!-- http://stackoverflow.com/questions/5185326/java-script-regular-expression-for-detecting-non-ascii-characters -->
+                <input id="register_password" type="password"
+                       ng-model="password" name="register_password" required
+                       ng-blur="passwordBlurred=true"
+                       ng-pattern="/^[\040-\176]{8,}$/">
+                <i class="icon-warning-sign password"
+                   ng-show="passwordBlurred && registerForm.register_password.$invalid">
+                    at least 8 characters, please
+                </i>
+                <input type="hidden" ng-model="page_action" value="register">
+                <input type="hidden" ng-model="auth_type" value="direct">
+                <!-- empty label used rather than <br> b/c it's easier to
+                control height -->
+                <label>&nbsp;</label>
+                <button ng-click="register()"
+                        ng-disabled="registerForm.$invalid">
+                    sign up
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- Facebook stuff...
+<script type="text/javascript">
+    var facebookConnectionStatus;
+
+    function requestFacebookLogin() {
+        window.location = '/login?login_requested=facebook';
+    }
+
+    $(document).ready(function () {
+        "use strict";
+        $.ajaxSetup({cache: true});
+        $.getScript('//connect.facebook.net/en_UK/all.js', function () {
+            window.fbAsyncInit = function () {
+                FB.init({
+                    appId: '{{ facebook_app_id }}',
+                    // todo: this has something to do with speeding up the
+                    // the connection, but I don' think we care
+                    // channelUrl: '//yourapp.com/channel.html',
+                    status: true,
+                    cookie: true,
+                    xfbml: true
+                });
+                FB.getLoginStatus(function (response) {
+                    // possible status values are:
+                    // connected         - logged into facebook AND the app
+                    // not_authorized    - logged into facebook BUT NOT the app
+                    // unknown           - not logged into facebook
+                    facebookConnectionStatus = response.status;
+                });
+            };
+        });
+        $("#facebook_login_button").click(function (clickEvent) {
+            if (facebookConnectionStatus == 'connected') {
+                // everything's good, just refresh with the login flag
+                requestFacebookLogin()
+            } else {
+                // not logged into the app; prompt the user to do so
+                // and watch for when they're done
+                FB.login();
+                FB.Event.subscribe('auth.authResponseChange', function (response) {
+                    if (response.status === 'connected') {
+                        requestFacebookLogin()
+                    } else {
+                        console.error("incomplete fb connection:", response);
+                    }
+                });
+            }
+        });
+    });
+</script>
+<img id="facebook_login_button" src="/static/images/facebook_128.png" style="display:inline-block;margin-right:25px;cursor:pointer">
+<div id="fb-root"></div>
+-->
+
+{% endblock %}

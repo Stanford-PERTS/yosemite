@@ -1,0 +1,9 @@
+<div id="pagination">
+    <i class="icon-double-angle-left" ng-click="setPage(0)"></i>
+    <i class="icon-angle-left" ng-click="setPage(pageIndex - 1)"></i>
+    <span bindonce ng-repeat="p in pageRange()" bo-text="p + 1"
+          ng-click="setPage(p)" ng-class="{active: pageIndex == $index}">
+    </span>
+    <i class="icon-angle-right" ng-click="setPage(pageIndex + 1)"></i>
+    <i class="icon-double-angle-right" ng-click="setPage('last')"></i>
+</div>

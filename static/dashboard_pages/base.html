@@ -1,0 +1,30 @@
+<!-- Navigation frame of dashboard. -->
+
+<div id="dashboard_fixed_header" class="navbar navbar-inverse navbar-fixed-top">
+    <div class="row">
+        <div class="span12 breadcrumb-wrapper">
+            <span ng-repeat="b in breadcrumbs"
+                  ng-class="{first: $index == 0, last: $index + 1 == breadcrumbs.length}"
+                  class="crumb [[ b.type ]]">
+                <a href="#[[b.link]]" ng-show="b.link">[[ b.name ]]</a>
+                <span ng-show="!b.link">[[ b.name ]]</span>
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span12">
+            <span id="level_label">[[ $root.levelLables[$root.level] ]]</span>
+            <span ng-repeat="tab in tabs"
+                  ng-class="{active: tab.id == $root.page, tab: true}">
+                <a href="#/[[$root.level + '/' + $root.entityId + '/' + tab.id]]"
+                   ng-hide="tab.id == $root.page">
+                    [[ tab.name ]]
+                </a>
+                <span ng-show="tab.id == $root.page">[[ tab.name ]]</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- page content -->
+<div id="dashboard_content" ng-include src="templateUrl"></div>

@@ -1,0 +1,48 @@
+{# Links to helpful documents #}
+
+{% extends "base.html" %}
+
+{% block header %}
+
+<script type="text/javascript">
+
+function DocumentsController($scope, $pertsAjax) {
+    $scope.cohorts = $pertsAjax({url: '/api/get/cohort'});
+}
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div ng-controller="DocumentsController">
+    <h1>Useful Documents</h1>
+    <ul>
+        <li ng-repeat="c in cohorts" style="list-style: none">
+            [[ c.name ]]
+            <ul>
+                <li>
+                    <a target="_blank" href="/p/SP/student_orientation?cohort=[[c.id]]">
+                        Session instructions
+                    </a>
+                </li>
+                <li>
+                    <a target="_blank" href="/sign_in_cards?cohort=[[c.id]]&session=1">
+                        Student sign-in cards for session 1
+                    </a>
+                </li>
+                <!-- HP17 runs B and C have only 1 session -->
+                <!--
+                <li>
+                    <a target="_blank" href="/sign_in_cards?cohort=[[c.id]]&session=2">
+                        Student sign-in cards for session 2
+                    </a>
+                </li>
+                -->
+            </ul>
+        </li>
+    </ul>
+</div>
+
+{% endblock %}

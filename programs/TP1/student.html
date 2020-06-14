@@ -1,0 +1,648 @@
+{% extends "templates/base_programs.html" %}
+
+{% block css %}
+<!-- don't use any of the normal css stylesheets -->
+<style>
+#loading {
+    background-color: white;
+    width: 100%;
+    height: 500px;
+    text-align: center;
+    padding-top: 200px;
+    font-size: 3em;
+    color: gray;
+}
+
+.ie6 #loading {
+    /* the loading screen just doesn't work on ie6 */
+    display: none;
+}
+
+#loading p.notice {
+    font-size: 16px;
+    width: 60%;
+}
+
+.old_browser_only { display: none; }
+.ie6 .old_browser_only, .ie7 .old_browser_only { display: block; }
+
+/* until angular releases 1.2 */
+.ng-hide {
+    display: none;
+}
+
+/* Allow developer's request to show the whole program to override hiding. */
+/* Note that adjoining classes like this are bad practice for browser */
+/* compatibility, but since it's a developer's feature, I don't care. */
+.ng-hide.show-all {
+    display: inherit;
+}
+</style>
+
+<!-- qualtrics-based stylesheet -->
+<link rel="stylesheet" href="/static/css/students.css">
+{% endblock %}
+
+{% block program_header %}
+
+<!-- Custom fonts -->
+<script type="text/javascript" src="//use.typekit.net/qnb2yzi.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<script>
+
+/* defined in programs.js: */
+/*global setupProgramController*/
+
+function ProgramController($scope, $pertsAjax, $forEachAsync, $q, $emptyPromise, $timeout, $window) {
+    'use strict';
+
+    // load all the generic program code from programs.js
+    setupProgramController($scope, $pertsAjax, $forEachAsync, $q, $emptyPromise, $window);
+
+    $scope.sessionOrdinal = undefined;
+    if (isStringNumeric(queryString('session_ordinal'), 'strict')) {
+        $scope.sessionOrdinal = Number(queryString('session_ordinal'));
+    }
+
+    ////// Function node defintions
+
+    // WARNING: Do not write AJAX calls into these functions. Doing so will
+    // break automated testing. See programs.js -> $scope.stratify().
+    // WARNING: If you call $scope.stratify(), you must return what it returns
+    // (a promise object);
+
+    // the markProgress() node is defined in programs.js
+
+    $scope.checkConsent = function () {
+        if ($scope.pd.consent !== 'true') {
+            return;
+        } else {
+            return new $scope.Position('start/menuBranch()');
+        }
+    };
+
+    $scope.menuBranch = function () {
+        $scope.pd.consent = 'true';
+        return new $scope.Position('menu/menu/1');
+    };
+
+    $scope.randomizeCondition = function () {
+        var stratifierName = 'student_condition';
+
+        //  if condition is already set, send it back
+        //  in a promise to simluate real behavior
+        if ($scope.pd.condition) {
+            return $emptyPromise($scope.pd.condition);
+        }
+        return $scope.stratify(stratifierName, {
+            classroom: $window.classroomId
+        }).then(function successCallback(condition) {
+            $scope.pd.condition = condition;
+            console.debug("...condition returned, calling synchronize", $scope.pd.condition);
+            // In Yosemite, students are redirected to Qualrics fairly quickly.
+            // We don't want to wait for a every-once-in-awhile synchronize
+            // call, otherwise important pd like condition might not be saved.
+            // Returning the promise from synchronize() makes sure the program
+            // flow pauses while it's busy, guaranteeing the user never even
+            // sees the redirection page until data is saved.
+            var force = true;
+            return $scope.synchronize(force);
+        }, function errorCallback(reason) {
+            console.debug("...sever stratification failed, relying on clientRandomizer()");
+            $scope.pd.condition = $window.clientRandomizer(stratifierName);
+            var force = true;
+            return $scope.synchronize(force);
+        }).then(function () {
+            console.debug("...synchronize complete", $scope.pd.condition);
+        });
+
+    };
+
+    // Make sure that students have qualtrics links in their pd.
+    $scope.getQualtricsLinks = function () {
+        // Loop through the activities/session of this program...
+        // (Return a promise from the whole process so the program app waits
+        // before executing the next node).
+        return $forEachAsync($scope.outline, function (moduleId, module) {
+            if (module.type === 'activity') {
+                var o = module.activity_ordinal;
+                var pdName = 's' + o + '__qualtrics_link';
+                // ...and check if their qualtrics link pds have been defined
+                if (!$scope.pd[pdName]) {
+                    // ...if they haven't, get fresh links and store them.
+                    // (Return the promise from the ajax call, which is
+                    // important for $forEachAsync to do its work.)
+                    return $pertsAjax({
+                        url: '/api/get_qualtrics_link/' + o
+                    }).then(function (link) {
+                        $scope.pd[pdName] = link;
+                    });
+                }
+            }
+        }, 'parallel').then(function () {
+            // Once the qualtrics link pds have been created locally, force
+            // a synchronize call with the server to make sure they're saved.
+            var force = true;
+            // (Return the promise from the synchronize call so that the whole
+            // statement (the $forEachAsync loop with it's then() call) returns
+            // a promise that only resolves when synchronize is done.)
+            return $scope.synchronize(force);
+        });
+    };
+
+    $scope.goToQualtrics = function (activityOrdinal) {
+        $scope.showQualtricsLoading = true;
+
+        // If link for this ordinal not present, use default.
+        var pdName = 's' + activityOrdinal + '__qualtrics_link';
+        var linkPd = $scope.pd[pdName];
+        var link = linkPd || $window.defaultQualtricsLinks[activityOrdinal];
+
+        // Translate special conditions to ones that Qualtrics understands.
+        var conditionMap = {
+            session_1_unknown: 'control'
+        };
+        var condition = conditionMap[$scope.pd.condition] || $scope.pd.condition;
+
+        // Construct redirection url.
+        var params = {
+            condition: condition,
+            user: $window.userId,
+            program: $window.programId,
+            activity_ordinal: activityOrdinal,
+            cohort: queryString('cohort')
+        };
+
+        // Log errors if we're missing parameters.
+        forEach(params, function (k, v) {
+            if (!v) {
+                $window.onerror("Missing Qualtrics redirection parameter " +
+                                k + ": " + JSON.stringify(params));
+                $scope.handleDisconnectedUser(
+                    "Sorry, we're having temporary problems.");
+            }
+        });
+
+        // Multiple things may go wrong before the user gets to this point.
+        // 1. They might not have been able to save their data. If so, the
+        //    function handleDisconnectedUser() will set allowRedirect to
+        //    false, and the user won't be sent to Qualtrics. Instead, their
+        //    page will refresh, and hopefully the server will respond the
+        //    next time.
+        // 2. They might not have all the data they're supposed to have,
+        //    especially if this is session 2 and something went wrong with
+        //    session 1, or if weird javascript loading errors have happened.
+        // Bottom line is, if the data isn't at hand for the redirect to
+        // qualtrics, don't let them go.
+        if ($scope.allowRedirect) {
+            $window.location.href = link + '&' + buildQueryString(params);
+        }
+
+        // The location redirect above doesn't happen instantly. Javascript
+        // and the program app keep running while the page loads. If we
+        // allowed that, we'd get a bunch of errors because there aren't any
+        // actual pages to go do (no markup to go with any hashes). To avoid
+        // this, return a promise that won't resolve, forcing the app to wait
+        // indefinitely.
+        return $q.defer().promise;
+    };
+}
+
+function ActivityMenuController($scope, $pertsAjax, $window) {
+    'use strict';
+    // In Yosemite we only want to show the menu when the user hasn't provided
+    // a session ordinal, i.e. when there is no target module.
+    $scope.displayMenu = false;
+
+    $scope.$watch('$parent.activeSegment', function (segment) {
+        if (segment === 'menu') {
+            $scope.determineAvailableModule();
+        }
+    });
+
+    $scope.toggleActivityOverride = function () {
+        if (queryString('activity_override') === 'true') {
+            queryString('activity_override', 'false');
+        } else {
+            queryString('activity_override', 'true');
+        }
+    };
+
+    $scope.determineAvailableModule = function () {
+        if (queryString('activity_override') === 'true') {
+            forEach($scope.$parent.outline, function (id, module) {
+                module.available = true;
+            });
+            return;
+        }
+        // Bypasses ONLY date logic (relative and absolute).
+        var dateOverride = queryString('date_override') === 'true';
+
+        // Yosemite student participation codes include the session ordinal,
+        // referred to here as the one 'targeted' by the code.
+        var targetOrdinal, targetModule;
+        if (isStringNumeric(queryString('session_ordinal'), 'strict')) {
+            targetOrdinal = +queryString('session_ordinal');
+        }
+
+        // Otherwise use the current date and the program config to determine
+        // which sessions are available to the user and show them a menu.
+        var today = $window.serverDateTime;
+        var determined = false;
+        var previousDateWindowOpen;
+        var valuesToLog = [];
+        forEach($scope.$parent.outline, function (id, module) {
+            if (module.type !== 'activity') { return; }
+
+            if (targetOrdinal && targetOrdinal === module.activity_ordinal) {
+                targetModule = module;
+            }
+
+            // date window
+            var dateOpen = Date.createFromString(module.date_open, 'local');
+            var dateClosed = Date.createFromString(module.date_closed, 'local');
+            var dateWindowOpen = dateOpen < today && today < dateClosed;
+
+            if (dateOverride) {
+                dateWindowOpen = true;
+            }
+
+            // is done
+            var progressKey = 's' + module.activity_ordinal + '__progress';
+            var progress = Number($scope.$parent.pd[progressKey]) || 0;
+            var status = $window.statusCodes[module.activity_ordinal];
+            var statusInfo = $window.statusCodeInfo[status] || {};
+            var done = progress === 100 || statusInfo.counts_as_completed;
+
+            // delay
+            var delaySatisfied, dateDone;
+            if (module.activity_ordinal > 1) {
+                var prevKey  = 's' + (module.activity_ordinal - 1) + '__progress';
+                dateDone = $scope.$parent.progressDates[prevKey] || today;
+                if (!previousDateWindowOpen) {
+                    delaySatisfied = true;
+                } else {
+                    delaySatisfied = Date.dayDifference(today, dateDone) > 2;
+                }
+            } else {
+                delaySatisfied = true;
+            }
+            previousDateWindowOpen = dateWindowOpen;
+
+            if (!determined && dateWindowOpen && !done) {
+                // Then this is the session they should be doing according to
+                // a normal progression. Let them through.
+                module.available = true;
+                module.menuMessage = 'Click the button to the left to begin.';
+                determined = true;
+            } else {
+                // We have some kind of weird case.
+                if (determined) {
+                    if (
+                        targetOrdinal &&
+                        targetOrdinal === module.activity_ordinal &&
+                        !$scope.pd.condition
+                    ) {
+                        // This means that the user SHOULD be doing a previous
+                        // session, but they asked for this one. We'll ask them
+                        // some more questions before deciding what to do with
+                        // them; don't let them in yet.
+                        module.available = false;
+                        $scope.queryUserBeforeSkipping = true;
+                    } else {
+                        // Give them what they asked for.
+                        module.available = true;
+                    }
+                } else if (!dateWindowOpen) {
+                    module.available = false;
+                    module.menuMessage = "This session is only available between " +
+                        dateOpen.toLocaleDateString() + " to " +
+                        dateClosed.toLocaleDateString();
+                } else if (done) {
+                    module.available = false;
+                    if (module.activity_ordinal === 1) {
+                        module.menuMessage = "You have already finished Session 1. If you are here to do a different session, return to the <a href='/go'>Login page</a> and use the code provided by your teacher.";
+                    } else {
+                    module.menuMessage = "You have already finished this session. Thanks!";
+                    }
+                }
+                // For Yosemite we don't care about delaySatisfied.
+            }
+
+            // Extra Yosemite logic: don't let a student into session 1 if
+            // they've done session 2.
+            if (module.activity_ordinal === 1 &&
+                $scope.$parent.pd.s2__progress !== undefined) {
+                module.available = false;
+                module.menuMessage = "You've already started session 2. " +
+                    "Session 1 is no longer available. Please work quietly " +
+                    "at your desk.";
+            }
+
+            valuesToLog.push({
+                module: id,
+                today: today,
+                dateOpen: dateOpen,
+                dateClosed: dateClosed,
+                dateDone: module.activity_ordinal > 1 ? dateDone : null,
+                delaySatisfied: delaySatisfied,
+                progress: progress,
+                available: module.available,
+                message: module.menuMessage || ''
+            });
+        });
+
+        // For Yosemite, where a target module will be specified via the
+        // participation code, we want to provide fewer options. Either
+        if (targetModule) {
+            if (targetModule.available) {
+                // forward them directly to their destination
+                targetModule.goToNextHash();
+            } else if ($scope.queryUserBeforeSkipping) {
+                $window.onerror("A student tried to go directly to session 2" +
+                    " before doing session 1.");
+            } else {
+                // or lock out the user for the calculated reason.
+                $scope.lockOutMessage = targetModule.menuMessage;
+                // Log an error so we are notified that a student got stuck
+                // (which shouldn't happen normally).
+                $window.onerror("A student was locked out of a session. " +
+                    "See the logs for menu logic details.");
+            }
+        } else {
+            // The target module couldn't be found, possibly because the
+            // session ordinal wasn't specified or didn't match anything.
+            // Show the menu.
+            $scope.displayMenu = true;
+        }
+
+        $window.pertsLog('info', {
+            activityMenuDetails: JSON.stringify(valuesToLog)
+        });
+    };
+
+    $scope.menuItems = forEach($scope.$parent.outline, function (id, module) {
+        if (module.type === 'activity') {
+            return module;
+        }
+    });
+
+    // Handles answers to the question "did you do session 1?", which happens
+    // when a user tries to go to session 2 w/o having any session 1 progress.
+    $scope.processSkipper = function () {
+        if ($scope.userDidSession1) {
+            // This is probably the result of misidentification. The student
+            // should be allowed to proceed to Session 2. However, their
+            // condition is set to "session_1_unknown" and they're sent to the
+            // control condition for session 2. In this case, the ICF
+            // coordinator (Deanna) will need to mark them for merging with
+            // their original entry. These students will consequently miss
+            // the session 2 intervention but will at least get to complete
+            // the surveys and will end up getting analyzed as a
+            // partially-treated student.
+            $scope.$parent.pd.condition = 'session_1_unknown';
+            // Give them the code "Merge: Wrong Name" for session 1 b/c we
+            // assume they have given the wrong name this time (compared to
+            // the name they gave the first time).
+            $window.statusCodes[1] = 'MWN';
+            $pertsAjax({
+                url: '/api/put/user/' + $window.userId,
+                params: {s1_status_code: 'MWN'}
+            }).then(function () {
+                forEach($scope.$parent.outline, function (id, module) {
+                    if (module.type === 'activity' &&
+                        module.activity_ordinal === 2) {
+                        module.goToNextHash();
+                    }
+                });
+            });
+        } else {
+            // This is a brand new student who happened to have missed
+            // Session 1. Because Session 1 is more important than Session 2,
+            // we actually want him to do Session 1 instead, so redirect them
+            // to Session 1. At that point, he's treated exactly as a Session 1
+            // participant, i.e., randomized to condition, etc.
+            forEach($scope.$parent.outline, function (id, module) {
+                if (module.type === 'activity' && module.activity_ordinal === 1) {
+                    module.goToNextHash();
+                }
+            });
+        }
+    };
+}
+
+</script>
+<style>
+
+/* ------------------------------------------------------------ */
+/* make the loading mask last all the way until a page displays */
+/* ------------------------------------------------------------ */
+
+#loading, #loading.ng-hide {
+    display: block;
+}
+
+#loading, #loading.ng-hide.program_page_loaded {
+    display: none;
+}
+
+#qualtrics_link_container {
+    height: 60px;
+}
+
+#qualtrics_link_container span {
+    vertical-align: top;
+}
+
+#qualtrics_link_container img {
+    position: relative;
+    top: -6px;
+}
+</style>
+
+{% endblock %}
+
+{% block program_content %}
+
+<div class="full-container students-paths">
+
+    <div id="header"></div>
+
+    <div class="outer-container">
+        <div class="inner-container with-nav">
+
+            <div id="module_start" show-module="start">
+                <div show-segment="consent">
+                    <div show-page class="container clearfix"
+                         hide-previous-button="start/consent/1">
+                        <div class="two-third">
+                            <div class="callout-text">To learn more about the study before you get started, read the section below.</div>
+                            <!-- iframe div for ipad height control
+                            http://stackoverflow.com/questions/6139564/iframe-size-on-ipad -->
+                            <div class="iframe_container">
+                                <iframe src="/static/consent/minor_consent.html"></iframe>
+                            </div>
+                            <p>
+                                If you understand the study and you are willing to
+                                participate, please click the "Next" button below.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="module_demo_end" show-module="demo_end">
+                <div show-segment="demo_end">
+                    <div show-page class="container clearfix">
+                        <div class="two-third">
+                            <p>
+                                This demo is over!
+                                <br><br>
+                                If you are a student or teacher participating in this program,
+                                you are seeing this message because of an error. Please contact
+                                us at  to report the problem and provide:
+                            </p>
+                            <ul>
+                                <li>Your browser, e.g., Firefox, Chrome, Internet Explorer...</li>
+                                <li>The name or email you use to sign into PERTS</li>
+                                <li>Your school name</li>
+                            </ul>
+                            <p>
+                                <br><br>
+                                Thank you!
+                                <br>
+                                The PERTS Team
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="module_menu" show-module="menu">
+                <div show-segment="menu">
+                    <div show-page class="container clearfix"
+                         ng-controller="ActivityMenuController"
+                         hide-previous-button="menu/menu/1"
+                         hide-next-button="menu/menu/1">
+                        <div ng-show="displayMenu">
+                            <p>Session Menu</p>
+                            <span class="align-right quiet"
+                                  ng-click="toggleActivityOverride()">choose other</span>
+                            <ul class="menu">
+                                <li ng-repeat="module in menuItems">
+                                    <button ng-click="module.goToNextHash()"
+                                            ng-disabled="!module.available">
+                                        Begin [[ module.name ]]
+                                    </button>
+                                    <span class="module_menu_message"
+                                          ng-bind-html-unsafe="module.menuMessage">
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div ng-show="lockOutMessage">
+                            <p ng-bind-html-unsafe="lockOutMessage"></p>
+                        </div>
+                        <div ng-show="queryUserBeforeSkipping">
+                            <p>Have you already done Session 1?</p>
+                            <label>
+                                <input type="radio" name="userDidSession1"
+                                       ng-model="userDidSession1" ng-value="true">
+                                Yes
+                            </label>
+                            <label>
+                                <input type="radio" name="userDidSession1"
+                                       ng-model="userDidSession1" ng-value="false" >
+                                No
+                            </label>
+                            <button ng-click="processSkipper()"
+                                    ng-disabled="userDidSession1 == undefined">ok</button>
+                        </div>
+                        <div ng-hide="queryUserBeforeSkipping || lockOutMessage || displayMenu"
+                             style="text-align: center; margin-top: 100px">
+                            <img src="/static/images/loading.gif">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Duplicates stuff normally in the base_programs_content block -->
+            <!-- so Matt Kandler could more easily apply nice styles. -->
+
+            <div id="program_navigation" ng-show="activePage">
+                <button class="nav_link previous button"
+                      ng-click="previousButton()"
+                      ng-show="showPreviousButton()">
+                    Previous
+                </button>
+                <button class="nav_link next button"
+                      ng-click="nextButton()"
+                      ng-show="showNextButton()">
+                    Next
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="footer">
+        <div class="foot-text">&copy; 2015 Stanford University. All Rights Reserved.</div>
+    </div>
+</div>
+
+{% endblock %}
+
+        {% block base_programs_content %}
+        {# allow gods to view program data #}
+        {% if normal_user.user_type in ['god','researcher'] %}
+        <hr>
+        <pre class="admin-control" id="data_view"> [[ pd | json:'  ' ]]</pre>
+        <div class="admin-control container">
+            <h3 ng-show="testing.pathResults.length > 0">Test Paths:</h3>
+            <div class="one-third" ng-repeat="r in testing.pathResults">
+                Path #[[ $index + 1]]
+                <pre >
+                    [[ r | json:'  ' ]]
+                </pre>
+            </div>
+            <div id="variable_integrity_readout">
+                <h3>Variables:</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>
+                                Model Name
+                            </th>
+                            <th>
+                                Duplicated
+                            </th>
+                            <th>
+                                Tag Names Match
+                            </th>
+                            <th>
+                                Values
+                            </th>
+                        </tr>
+                        <tr ng-repeat="v in testing.variableResults">
+                            <td>
+                                [[ v.ngModelName ]]
+                            </td>
+                            <td>
+                                [[ v.likelyDuplicate() ]]
+                            </td>
+                            <td>
+                                [[ v.namesMatch() ]]
+                            </td>
+                            <td>
+                                [[ v.getValues() ]]
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endblock %}
+
+

@@ -1,0 +1,52 @@
+<h3>Information for [[ user.login_email ]].</h3>
+<div class="row">
+    <form name="userBasicsForm">
+        <div class="span4">
+            <label for="userBasics_firstName">First Name *</label>
+            <input id="userBasics_firstName" type="text" ng-model="user.first_name"
+                         ng-blur="syncNames()" required>
+            <label for="userBasics_lastName">Last Name *</label>
+            <input id="userBasics_lastName" type="text" ng-model="user.last_name"
+                         required>
+        </div>
+        <div class="span4">
+            <label for="userBasics_name">I prefer to go by (students won't see this) *</label>
+            <input id="userBasics_name" type="text" ng-model="user.name" required>
+            <label for="userBasics_phone">Phone Number *</label>
+            <input id="userBasics_phone" type="text" ng-model="user.phone" required>
+        </div>
+        <div class="span3">
+            <div ng-show="$root.userType == 'researcher' || $root.userType == 'god'">
+                    User registered: [[ user.created.substring(0,10) ]]
+                    <br>
+                    user type:
+                    <select styled-select ng-model="user.user_type">
+                            <option value="teacher">teacher</option>
+                            <option value="school_admin">school admin</option>
+                            <!-- We aren't using researchers in Yosemite. -->
+                            <!-- <option value="researcher">researcher</option> -->
+                            <option value="god">god</option>
+                    </select>
+                    <br><br>
+                    <button ng-click="deleteUser(user)">
+                        <i class="icon-trash"></i>&nbsp;&nbsp;delete user
+                    </button>
+            </div>
+        </div>
+        <div class="span12" ng-show="$root.userType == 'researcher' || $root.userType == 'god'">
+                Notes:
+                <br>
+                <textarea ng-model="user.notes" class="span10"></textarea>
+        </div>
+        <div class="span12" ng-show="mode == 'registration_survey'"
+             style="margin-top: 30px">
+            <button ng-click="submitAsRegistrationSurvey()"
+                    ng-disabled="userBasicsForm.$invalid">
+                Continue
+            </button>
+        </div>
+    </form>
+</div>
+
+
+

@@ -1,0 +1,13 @@
+# This file defines map reduce jobs which we can run from the app admin panel
+# and from /mapreduce. But it doesn't allow you to specify what task queue they
+# use, so we typically define such jobs via the python api. See map.py.
+
+mapreduce:
+
+# - name: systematic_update-lower_case_login
+#   mapper:
+#     input_reader: mapreduce.input_readers.DatastoreInputReader
+#     handler: page_handlers.lower_case_map
+#     params:
+#     - name: entity_kind
+#       default: core.User

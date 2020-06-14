@@ -1,0 +1,9 @@
+<h4>School Coordinators</h4>
+<div ng-show="noAdmins()">
+	<p style="color:red;">Warning: No school admins assigned!</p>
+</div>
+<ul>
+    <li ng-repeat="admin in adminList">
+        [[ admin.first_name ]] [[ admin.last_name ]] ([[ admin.login_email ]])
+    </li>
+</ul>

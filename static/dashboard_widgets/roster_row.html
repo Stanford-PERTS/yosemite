@@ -1,0 +1,66 @@
+<!-- The complicated ng-hide here does the necessary filtering for the
+     makeups view. That view should 1) only show the selected session,
+     2) filter out students with study-ineligible or makeup-ineligible status
+     codes, and 3) filter out students who have finished the session, leaving
+     only uncoded, unfinished, and makeup-eligible students. -->
+<tr ng-repeat="session in sessions"
+    ng-hide="makeups && (
+                progress(session) == 100 ||
+                (
+                    myCodes[session.activity_ordinal] &&
+                    !myCodes[session.activity_ordinal].makeup_eligible
+                ) ||
+                session.activity_ordinal != makeupSession
+            )"
+    ng-class="{warning:!user.certified && classroom.roster_complete && !hasMWN}">
+
+    <!-- the rowspan expression here is a hack to get around the fact that -->
+    <!-- angular doesn't allow if/thens in expressions; it turns a -->
+    <!-- boolean into a 0 or a 1 and generates a rowspan of 1 or 2 -->
+    <td rowspan="[[ (makeups != 'true') + 1 ]]" class="select" ng-show="($index == 0 || makeups)">
+        <input type="checkbox" ng-model="$parent.isSelected">
+    </td>
+    <td rowspan="[[ (makeups != 'true') + 1 ]]" class="classroom"
+        ng-show="($index == 0 || makeups) && $root.level == 'cohort'">
+        <a href="#/classroom/[[ user.assc_classroom_list[0] ]]/roster">
+            [[ see(user.assc_classroom_list[0]).name ]]
+        </a>
+    </td>
+    <td rowspan="[[ (makeups != 'true') + 1 ]]" class="first_name" ng-show="($index == 0 || makeups)">
+        <input type="text" ng-model="user.first_name">
+        <!-- Use the keyboard shortcut "p p i", defined in
+             keyboardShortcuts.js, to show this. -->
+        <span class="id-display" style="display: none">
+            <br>[[ user.id ]]
+        </span>
+    </td>
+    <td rowspan="[[ (makeups != 'true') + 1 ]]" class="last_name" ng-show="($index == 0 || makeups)">
+        <input type="text" ng-model="user.last_name">
+    </td>
+    <td rowspan="[[ (makeups != 'true') + 1 ]]" class="certified"
+        ng-show="($index == 0 || makeups) && $root.level == 'classroom'">
+        <select styled-select ng-model="user.certified"
+                ng-disabled="hasMWN"
+                ng-options="getCertifiedLabel(x) for x in [true, false]">
+        </select>
+    </td>
+    <td class="session_progress" ng-hide="makeups && makeupSession != $index + 1">
+        [[ session.activity_ordinal ]] - [[ progress(session) ]]%
+    </td>
+    <td class="status_code" ng-hide="makeups && makeupSession != $index + 1">
+        <select styled-select
+                ng-model="user['s' + session.activity_ordinal + '_status_code']"
+                ng-options="o.id as o.label group by o.group for o in statusCodes | orderBy:['group', 'label']">
+        </select>
+        <br>
+        <span ng-show="user['s' + session.activity_ordinal + '_status_code'] == 'MWN' && !user['s' + session.activity_ordinal + '_merge_id']"
+              ng-click="openDialog(session.activity_ordinal)" class="pseudolink">
+            <i class="icon-warning-sign"></i>Specify with whom to merge
+        </span>
+        <span ng-show="user['s' + session.activity_ordinal + '_merge_id']"
+              ng-click="openDialog(session.activity_ordinal)" class="pseudolink">
+            [[ mergeTargets[session.activity_ordinal].first_name ]] [[ mergeTargets[session.activity_ordinal].last_name ]]
+        </span>
+    </td>
+</tr>
+

@@ -1,0 +1,5 @@
+# When merging other branches into yosemite, like the (pegasus) master branch,
+# ignore these files.
+app.yaml merge=ours
+cron.yaml merge=ours
+.gitattributes merge=ours

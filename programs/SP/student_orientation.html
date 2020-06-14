@@ -1,0 +1,623 @@
+{% extends "templates/base_programs.html" %}
+
+{# This template is handled by page_handlers.ProgramHandler, #}
+{# the same handler as for the program app. #}
+
+{% block program_header %}
+
+<style>
+
+body {
+    color: #333; /* dark-gray */
+}
+
+h3 {
+    font-size: 22px;
+}
+
+strong {
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+blockquote {
+    border: 1px solid #ddd; /* very-light-gray */
+    margin-top: 10px;
+    background-image: initial;
+    padding-left: 25px;
+}
+
+ul {
+    margin-top: 10px;
+}
+
+li {
+    margin-left: 4em;
+    margin-bottom: 20px;
+}
+
+section#content a {
+    color: blue;
+    text-decoration: underline;
+}
+
+#content img.print-only {
+    margin-bottom: 10mm;
+}
+
+/* http://stackoverflow.com/questions/10732690/offsetting-an-html-anchor-to-adjust-for-fixed-header */
+a.anchor {
+    display: block;
+    position: relative;
+    top: -150px;
+    visibility: hidden;
+}
+
+p.title {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 0;
+    line-height: 1.4em;
+}
+
+p.letter-greeting {
+    /*font-style: italic;*/
+}
+
+p.letter-body {
+    text-indent: 1.5em;
+}
+
+p.letter-closing {
+    /*margin-left: 60%;*/
+}
+
+p.important-body {
+    font-weight: bold;
+}
+
+p.important-body strong {
+    font-weight: bold;
+}
+
+ul.toc li {
+    margin-bottom: 5px;
+}
+
+.cohort_code {
+    font-size: 1.25em;
+    font-weight: bold;
+    color: #CB0000;
+    padding: 10px 10px 10px 10px;
+    border: 1px #CB0000 solid;
+
+}
+
+span.blank-line {
+    width: 75%;
+    border-bottom:1px solid black;
+    display: inline-block;
+}
+
+.make-up-info-table tr {
+    background-color: transparent;
+}
+
+.make-up-info-table td {
+    padding: 0 0 10px 0;
+}
+
+.make-up-table {
+    border-collapse: collapse;
+}
+
+.make-up-table th {
+    color: black;
+    background-color: #ddd !important; /* very-light-gray */
+    border: 1px solid black;
+}
+
+.make-up-table tr {
+    background-color: transparent;
+}
+
+.make-up-table td {
+    border: 1px solid black;
+    padding: 11px 10px;
+}
+
+.well {
+    padding: 19px 19px 5px 19px;
+}
+
+.well h3 {
+    text-align: center;
+}
+
+.well table {
+    border-collapse: collapse;
+}
+
+.well tr, .well tr:nth-child(odd) {
+    background-color: transparent;
+}
+
+.well td {
+    padding: 0 5px;
+    border: none;
+}
+
+</style>
+
+<script type="text/javascript">
+function Controller($scope, $pertsAjax) {
+    $pertsAjax({
+        url: '/api/get/cohort',
+        params: {id: queryString('cohort')}
+    }).then(function (response) {
+        $scope.cohort = response[0];
+    });
+
+    $scope.numMakeUpRows = range(15);
+}
+
+$().ready(function () {
+    $('.navbar, #footer').addClass('no-print');
+});
+</script>
+{% endblock %}
+
+
+
+{% block content %}
+
+<div ng-controller="Controller">
+
+<!-- <img class="print-only" src="/static/images/studentspaths_logo.png" style="height:70px"> -->
+<p class="title">Students’ PATHS+ Session Instructions</p>
+<p class="title">[[ cohort.name ]]</p>
+<br>
+
+<p class="letter-greeting">Dear Teachers,</p>
+<p>
+    Thank you for your school&rsquo;s work in the fall to help implement PATHS+.
+    For the final portion of the program this year, your 9th grade students will
+    again complete an online survey about academic motivation, self-esteem and
+    social anxiety. The step-by-step instructions you will need to introduce and
+    facilitate this program are included in this document. Please take a few
+    minutes to review these instructions and have them with you when your
+    class(es) are scheduled to participate. We have also included some helpful
+    tips regarding troubleshooting and FAQs, so you know what to do if any
+    issues or questions come up while your students are participating.
+</p>
+<p>
+    Because high classroom and student completion rates are important to the
+    goals of this study, students who do not participate on the day the
+    sessions are planned will be asked to attend a make-up session. Please use
+    the attached &ldquo;Student Make-Up List&rdquo; to indicate which students
+    did not participate and the reason why. Instructions are included on that
+    form.
+</p>
+<p>
+    Please follow the instructions below. The survey will take approximately
+    30-40 minutes to complete.
+</p>
+
+<h2>Instructions</h2>
+
+<h3>Step 1</h3>
+
+<p class="important-body">
+    All participating students should have an Internet-connected device to
+    complete the survey, and only one student should be using each device.
+    Any students who do not have parental permission to participate should be
+    provided with an alternate activity while the rest of the class goes
+    through the survey.
+</p>
+
+<h3>Step 2</h3>
+
+<p class="important-body">Read the following instructions to the class.</p>
+<blockquote>
+    <p>
+        &ldquo;Our school is participating in a survey developed by the
+        University of Texas at Austin. Today, our class will complete an online
+        survey that may help teachers and administrators at our own school and
+        researchers better understand how to make school a better place for all
+        students. The survey questions are designed to help us understand more
+        about the way you, as high school students, think and learn and how you
+        feel in regards to academic motivation, self-esteem and social anxiety.
+    </p>
+    <p>
+        &ldquo;Participating in this survey is voluntary and your grade in this
+        class will not be affected whether you complete the survey or not. You
+        may skip any question or survey you do not wish to answer or complete.
+        When responding, choose the answer that best fits what you know or feel.
+        Don&rsquo;t pick a response just because you think that&rsquo;s what
+        someone wants you to say. Only a limited number of students are
+        participating in this survey, and the answers you give are very
+        important so the results are useful.
+    </p>
+    <p>
+        &ldquo;I would like to emphasize that this is not a test of you or this
+        school. Remember: we will use what we learn to improve students&rsquo;
+        experience here and at other schools as well. So please read the
+        instructions carefully and do your best to answer all of the questions
+        to the best of your ability. If participating in today&rsquo;s activity
+        raises any questions or concerns for you, please contact Mr./Ms.
+        _____________ at the school.
+    </p>
+    <p>
+        &ldquo;Finally, it is <strong>very important</strong> that you
+        not talk to each other or look at each other&rsquo;s screens. That
+        would be a violation of privacy, and I cannot allow it. No one at our
+        school will look at your specific answers.
+    </p>
+    <p>
+        &ldquo;We&rsquo;ll get started in just a moment. When you finish, please
+        remain quiet so others can finish too.&rdquo;
+    </p>
+</blockquote>
+
+<p class="important-body">Pause here to answer any questions.</p>
+
+<h3>Step 3</h3>
+<p class="important-body">
+    Write the website address and the code phrase on the board where all your
+    students can see it. Distribute the student sign-in cards
+    that were prepared for you by your School Coordinator.
+    If any student does not have a sign-in card (e.g., new student), they can
+    still participate. Instruct them to go to the URL, enter the code phrase,
+    and then select this class from the drop down menu. They should then follow
+    the instructions on the screen.
+</p>
+<p class="important-body">
+    Read the following:
+</p>
+<blockquote>
+    <p>
+        &ldquo;Now open your browser and please go to
+        <b>studentspaths.org/go</b>. Enter the phrase &lsquo;<strong>[[
+        cohort.code ]] 1</strong>&rsquo; and follow the on-screen
+        instructions.&rdquo;
+    </p>
+    <p>
+        &ldquo;Please be aware that as you move through the survey, you may
+        <strong>not</strong> go back to a previous question. The browser&rsquo;s
+        back button won&rsquo;t work during the survey. This protects your
+        privacy by never displaying your previous answers to anyone.
+    </p>
+
+    <p>
+        &ldquo;Use the drop down menu and select the class shown on the sign in
+        card I just gave you. Then, enter your full first and last names in the
+        appropriate boxes as shown on your card. If you have a nickname you
+        prefer to use, you can enter it, but you must also enter your first and
+        last name.
+    </p>
+
+    <p>&ldquo;Please begin.&rdquo;</p>
+</blockquote>
+
+<h3>Step 4</h3>
+<p class="important-body">
+    As the students are completing the survey, please complete the <em>Student
+    Make-Up List</em> to indicate which students on your roster are
+    <strong>not</strong> participating and the reason why not. Return this form
+    to your School Coordinator at the end of the survey, or no later than the
+    end of the school day.
+</p>
+
+<p class="important-body">
+    Write on the board the name and contact information of the school counselor
+    or another school mental health professional to whom students with questions
+    can be referred.
+</p>
+
+<h3>Step 5</h3>
+<p class="important-body">
+    At the end of the class period, ask your students to log out by closing
+    their browser window.
+</p>
+<blockquote>
+    <p>
+        &ldquo;We have reached the end of the survey. It&rsquo;s okay if you are
+        not totally done with the survey, just close the browser.
+    </p>
+    <p>
+        &ldquo;Thank you. The information you have provided may be used to
+        improve students&rsquo; experience here and at other schools as well. If
+        participating in today&rsquo;s activity raises any questions or concerns
+        for you, please contact Mr./Ms. _____________ listed on the board.
+    </p>
+    <!--
+    <p>
+        &ldquo;If you have any questions related to your participation in this
+        study, please contact Stephanie Richelsen, Project Manager, at ICF,
+        toll-free at 1-844-225-6089.&rdquo;
+    </p>
+    -->
+</blockquote>
+
+
+<div class="page-break"></div>
+<h2>Troubleshooting</h2>
+<a class="anchor" id="troubleshooting"></a>
+<p>
+    We work hard to minimize technical problems, but sometimes issues come
+    up. Here are some problems students have experienced in the past and the
+    best ways to solve them.
+</p>
+<!--
+<p>
+    If there is a time-sensitive problem that you need assistance with, please
+    call <b>1-844-225-6089</b>. For all school-related issues please contact
+    your school’s Study Coordinator.
+</p>
+-->
+<p>
+    For all school-related issues please contact your school’s Study
+    Coordinator.
+</p>
+
+<h3>Closed Page</h3>
+<p>
+    <strong>Problem</strong>: A student closed the browser window.<br>
+    <strong>Solution</strong>: Tell the student to go to
+    <a href="https://www.studentspaths.org/go">studentspaths.org/go</a> and
+    sign in again, just like they did the first time. The survey will continue
+    where the student left off.
+</p>
+
+<h3>Warning Message or Connection Expired Message</h3>
+<p>
+    <strong>Problem</strong>: A student&rsquo;s screen says that the connection
+    expired or a similar warning.<br>
+    <strong>Solution</strong>: Click the &ldquo;reload&rdquo; or
+    &ldquo;refresh&rdquo; button.
+</p>
+
+<h3>Stuck on a page</h3>
+<p>
+    <strong>Problem</strong>: A student can&rsquo;t get past a certain page in
+    the survey.<br>
+    <strong>Solution</strong>: Hold down the control key
+    (labeled "Ctrl" or "control") and press the y key. This will advance the
+    survey to the next
+    page.
+</p>
+
+<h3>Lost Location</h3>
+<p>
+    <strong>Problem</strong>: The survey restarted from the beginning.<br>
+    <strong>Solution</strong>: Tell the student to skip up to the part where
+    they left off (don't worry; the answers the student previously provided
+    have been saved).
+</p>
+
+<h3>Student receives the message "You have already taken this survey" or similar</h3>
+<p>
+    <strong>Problem</strong>: The student is given a message with a reason why
+    they cannot access they survey.<br>
+    <strong>Solution</strong>: There are many reasons this might happen. Most of
+    the time the message is correct, e.g. the student already took this or a
+    later survey. However, if you and the student determine that the message is
+    incorrect and they should still participate, the student can sign in again
+    under a different name. For example, &ldquo;Mindy Patel&rdquo; could instead
+    sign in as &ldquo;Mindy Patel-Different&rdquo;. When the computer asks if
+    the student is really &ldquo;Mindy Patel&rdquo; select &ldquo;None of the
+    above&rdquo; and then the student will be able to access the survey. The new
+    name can later be linked with the student&rsquo;s correct account.
+</p>
+
+<h3>Cannot Connect to studentspaths.org/go</h3>
+<p>
+    <strong>Problem</strong>: Students cannot access the sign-in page when they
+    go to studentspaths.org/go.</br>
+    <strong>Solution</strong>: Check if they can access another website, like
+    google.com.
+</p>
+<ul>
+    <li>
+        If not, there is a problem with your Internet connection. Talk to
+        technical support staff at your school to resolve the issue.
+    </li>
+    <!--
+    <li>
+        If you can connect to google.com but you cannot connect to
+        studentspaths.org/go, wait for a few minutes and try again. If the
+        connection still does not work, call 1-844-225-6089 to speak with a
+        study researcher. If you do not reach someone immediately, please leave
+        a message and someone will call you back promptly.
+    </li>
+    -->
+</ul>
+
+<h3>A Student Completed the Study in Another Class</h3>
+<p>
+    <strong>Problem</strong>: A student tells you they have already completed
+    the survey in another class.</br>
+    <strong>Solution</strong>: The student should NOT do the same session of
+    the study more than once. Ask the student to work on something else quietly
+    or you may let them leave quietly.
+</p>
+
+<h3>Some Students Ran Out of Time</h3>
+<p>
+    <strong>Problem</strong>: Some students do not complete the survey.</br>
+    <strong>Solution</strong>: That is fine. Just ask them to get as much done
+    as possible. They may be asked to try to complete the session on a later
+    date.
+</p>
+
+<div class="page-break"></div>
+<h2>Answers to Student Questions</h2>
+<a class="anchor" id="student_questions"></a>
+<ul class="student_questions">
+    <li>
+        <strong>Do I have to do this?</strong><br>
+        Your opinions are important, so I hope that you would at least
+        try.<br>
+        <em>If a student refuses again, just accept this. You should add them
+        to the Student Make-Up List as &ldquo;student refusal,&rdquo; as they
+        may change their mind and be interested in participating at a later
+        date.</em>
+    </li>
+    <li>
+        <strong>Why should I do this?</strong><br>
+        Because all of my students are doing this today, and we will learn
+        important information.
+    </li>
+    <li>
+        <strong>Will I get a grade on this?</strong><br>
+        It&rsquo;s not graded. But, when you provide honest answers, it will
+        help faculty to do a better job teaching students like you in the
+        future.
+    </li>
+    <li>
+        <strong>Why do I have different questions from him/her?</strong><br>
+        Different students are doing different activities. The survey has a lot
+        of different activities, but there&rsquo;s not enough time for everyone
+        to do all of them. You should do the ones you were assigned.
+    </li>
+    <li>
+        <strong>Does spelling and grammar matter?</strong><br>
+        No, just concentrate on getting your ideas across.
+    </li>
+</ul>
+<br><br>
+
+
+<div class="page-break"></div>
+<p class="title">Students&rsquo; PATHS+ Student Make-Up List</p>
+<p class="title">Spring 2018</p>
+<br>
+
+<p class="letter-greeting">Dear Teacher,</p>
+<p>
+    Thank you for your participation in the Students’ PATHS+ program. Please
+    fill in the names of any students on your official class roster that did
+    not participate in today’s session and use the codes below to indicate the
+    reason.
+</p>
+<p>
+    Please return this form to me at the end of the session or no later than
+    the end of the school day.
+</p>
+<p class="letter-closing">
+    Again, thank you for your help.<br>
+</p>
+
+<hr style="border:1px solid black;height:0;margin-bottom:30px">
+
+<table class="make-up-info-table">
+    <tbody>
+        <tr>
+            <td>
+                Teacher Name:&nbsp;
+                <span class="blank-line"></span>
+            </td>
+            <td>
+                Date:&nbsp;
+                <span class="blank-line"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Class:&nbsp;
+                <span class="blank-line"></span>
+            </td>
+            <td>
+                Period:&nbsp;
+                <span class="blank-line"></span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="make-up-table">
+    <thead>
+        <tr>
+            <th>Student Needing Make-Up</th>
+            <th>Code*</th>
+            <th>Student Needing Make-Up</th>
+            <th>Code*</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="x in numMakeUpRows">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="well span11">
+        <h3>*<strong>Participation Codes</strong></h3>
+        <table class="span5">
+            <tbody>
+                <tr>
+                    <td>A</td><td>Absent</td>
+                </tr>
+                <tr>
+                    <td>ISS</td><td>In School Suspension</td>
+                </tr>
+                <tr>
+                    <td>SR</td><td>Student Refusal</td>
+                </tr>
+                <tr>
+                    <td>NFR</td><td>No Form Returned (active permission only)</td>
+                </tr>
+                <tr>
+                    <td>T</td><td>Technology Related Issue</td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="span5">
+            <tbody>
+                <tr>
+                    <td>CCI</td><td>Cannot Complete Independently</td>
+                </tr>
+                <tr>
+                    <td>DC</td><td>Dropped Class</td>
+                </tr>
+                <tr>
+                    <td>DS</td><td>Dropped School</td>
+                </tr>
+                <tr>
+                    <td>E</td><td>Expelled</td>
+                </tr>
+                <tr>
+                    <td>EA</td><td>Extended Absence</td>
+                </tr>
+                <tr>
+                    <td>H</td><td>Homebound</td>
+                </tr>
+                <tr>
+                    <td>MA</td><td>Moved Away</td>
+                </tr>
+                <tr>
+                    <td>OGR</td><td>Out of Grade Range</td>
+                </tr>
+                <tr>
+                    <td>OSS</td><td>Out of School Suspension</td>
+                </tr>
+                <tr>
+                    <td>PR</td><td>Parental Refusal</td>
+                </tr>
+                <tr>
+                    <td>TAC</td><td>Took in Another Class</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</div> <!-- end Controller -->
+
+{% endblock %}
+
+

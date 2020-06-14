@@ -1,0 +1,188 @@
+<style>
+    #certify_button {
+        background-color: #f15a23; /* orange */
+    }
+
+    #certify_button[disabled] {
+        background-color: white;
+        color: #333; /* dark-gray */
+        border: 1px solid #ddd; /* very-light-gray */
+        cursor: default;
+    }
+
+    .makeup-button[disabled="disabled"] {
+        background-color: #f15a23; /* orange */
+    }
+
+    form[name="addCsvUsersForm"] button {
+        margin-top: 10px;
+    }
+
+    form[name="addCsvUsersForm"] img {
+        position: relative;
+        top: 12px;
+        margin-left: 10px;
+        margin-bottom: 0;
+    }
+
+</style>
+
+<table class="dashboard-table roster_summary" ng-hide="makeups">
+    <colgroup>
+        <col ng-repeat="col in summaryColumns" class="[[col.colClass]]" span="1">
+    </colgroup>
+    <thead>
+        <!-- This first row is essentially categories of columns. The colX
+        classes allow us to apply borders only on certain columns. -->
+        <tr>
+            <th colspan="1" class="col0" style="color:black">Summary</th>
+            <th colspan="2" class="col1 col2">Total Students</th>
+            <th colspan="2" class="col3 col4">Certified Students</th>
+            <th colspan="4" class="col5 col6 col7 col8">Study Eligible</th>
+        </tr>
+        <tr>
+            <th ng-repeat="col in summaryColumns" class="[['col' + $index]]"
+                tooltip="[[col.tooltip]]">
+                [[ col.name ]]
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="o in [1, 2]">
+            <td class="col0">Session [[ o ]]</td>
+            <td class="col1">[[ summary[o].uncertified ]]</td>
+            <td class="col2">[[ summary[o].certified ]]</td>
+            <td class="col3">[[ summary[o].studyIneligible ]]</td>
+            <td class="col4">[[ summary[o].studyEligible ]]</td>
+            <td class="col5">[[ summary[o].completed ]]</td>
+            <td class="col6">[[ summary[o].makeupIneligible ]]</td>
+            <td class="col7">[[ summary[o].makeupEligible ]]</td>
+            <td class="col8">[[ summary[o].uncoded ]]</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr ng-hide="makeups"></hr>
+
+<div class="row" ng-show="showAddForm">
+    <div class="span12">
+        <fieldset>
+            <i class="pull-right icon-remove close-button"
+               ng-click="showAddForm = false"></i>
+            <form name="addSingleUserForm">
+                <label>
+                    First name
+                    <input type="text" ng-model="newStudent.first_name"
+                           placeholder="first name" required>
+                </label>
+                <label>
+                    Last name
+                    <input type="text" ng-model="newStudent.last_name"
+                           placeholder="last name" required>
+                </label>
+                <button ng-click="addSingleUser()"
+                        ng-disabled="addSingleUserForm.$invalid">
+                    Add single student
+                </button>
+                <span id="confirm_add_single_user" style="display:none">
+                    <i class="icon-ok"></i>&nbsp;Done
+                </span>
+            </form>
+            <hr>
+            <form name="addCsvUsersForm">
+                <p>Paste tab-separated values here to add many users at once. Copying and pasting from a spreadsheet is recommended.</p>
+                <p>Use two columns, and include the column headings "first_name" and "last_name".</p>
+                <p ng-show="alert" ng-class="alert.type">[[ alert.msg ]]</p>
+                <textarea ng-model="userCsv" class="span11" required
+                          autogrow placeholder="Name your columns 'first_name' and 'last_name'">
+                </textarea>
+                <br>
+                <button ng-click="addCsvUsers()"
+                        ng-disabled="addCsvUsersForm.$invalid || addCsvUsersBusy">
+                    Add multiple students
+                </button>
+                <img src="/static/images/better_loading.gif"
+                     ng-show="addCsvUsersBusy">
+                <span id="confirm_add_csv_users" style="display:none">
+                    <i class="icon-ok"></i>&nbsp;Done
+                </span>
+            </form>
+        </fieldset>
+    </div>
+</div>
+
+<div class="row dashboard-table-controls">
+    <div class="span12">
+        <input type="test" ng-model="filterText" placeholder="Search..."
+               ng-focus="$broadcast('/dashboardTable/filterFocus')">
+        <span ng-show="$root.level == 'classroom'">
+            <select chosen-select
+                    data-placeholder="Move student(s) to..."
+                    select-options="destinationClassrooms"
+                    ng-options="c as c.name for c in destinationClassrooms"
+                    ng-model="moveToClassroom"
+                    ng-disabled="selectedUsers.length == 0 || destinationClassrooms.length == 0">
+                <!-- Empty option tag works around bug in chosen plugin. -->
+                <!-- http://stackoverflow.com/questions/19369250/uncaught-typeerror-cannot-set-property-selected-of-undefined -->
+                <option value=""></option>
+            </select>
+        </span>
+        <button class="icon_button" ng-disabled="selectedUsers.length == 0"
+                ng-click="deleteSelectedUsers()">
+            <i class="icon-trash"></i>
+        </button>
+
+        <!-- Roster action buttons -->
+        <button id="certify_button" class="pull-right"
+                ng-hide="makeups || $root.level != 'classroom'"
+                ng-click="markRosterAsComplete()"
+                ng-disabled="classroom.roster_complete">
+            <span ng-hide="classroom.roster_complete">
+                <i class="icon-ok"></i>&nbsp;&nbsp;Complete Class Roster
+            </span>
+
+            <span ng-show="classroom.roster_complete">
+                Roster Completed [[ rosterCompleteDate() ]]
+            </span>
+        </button>
+        <button ng-click="showAddForm = true" ng-disabled="showAddForm"
+                class="pull-right" ng-hide="makeups || $root.level != 'classroom'">
+            <i class="icon-plus"></i>&nbsp;&nbsp;Add Student
+        </button>
+
+        <!-- Makeups view control buttons -->
+        <button ng-show="makeups" ng-disabled="makeupSession == 2"
+                class="makeup-button pull-right" ng-click="makeupSession = 2">
+            Session 2
+        </button>
+        <button ng-show="makeups" ng-disabled="makeupSession == 1"
+                class="makeup-button pull-right" ng-click="makeupSession = 1">
+            Session 1
+        </button>
+    </div>
+</div>
+
+<table class="dashboard-table roster_table">
+    <colgroup>
+        <col ng-repeat="col in columns" class="[[col.colClass]]" span="1">
+    </colgroup>
+    <thead>
+        <tr>
+            <th ng-repeat="col in columns" ng-click="sortBy($index)">
+                [[ col.name ]]
+                <input type="checkbox" ng-show="col.colClass == 'select'"
+                       ng-model="allSelected"
+                       ng-change="toggleSelectAll(allSelected)">
+            </th>
+        </tr>
+    </thead>
+    <tbody ng-repeat="user in userList" roster-row
+           user-id="[[ user.id ]]" filter-text="filterText"
+           classroom="classroom"
+           makeups="makeups" makeup-session="makeupSession">
+    </tbody>
+</table>
+
+<div id="empty-table-hint" ng-show="makeups && !makeupSession">
+    To view make-up eligible students, choose a session using the buttons above.
+</div>

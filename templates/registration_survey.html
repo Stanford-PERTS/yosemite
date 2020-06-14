@@ -1,0 +1,51 @@
+{# A simple form teachers must fill out after creating an account. #}
+
+{% extends "base.html" %}
+
+{% block title %}
+Registration Survey
+{% endblock %}
+
+{% block header %}
+
+{% if is_localhost %}
+    <script src="/static/js/datepickr.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+{% else %}
+    <script src="/static/js/dist/dashboard.min.js"></script>
+{% endif %}
+
+<script>
+
+var programAbbr = '{{program.abbreviation}}';
+
+</script>
+
+<style>
+#content .info {
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+#content .info i {
+    font-size: 1.5em;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+    {% if registration_email_sent %}
+    <div class="info" ng-hide="emailMessageClosed"
+         ng-click="emailMessageClosed = true">
+        Welcome! We've sent you an email at
+        <strong>{{ user.login_email }}</strong>
+        to confirm your registration.
+        <i class="icon-remove align-right"></i>
+    </div>
+    {% endif %}
+
+    <h2>Please tell us about yourself</h2>
+    <div user-basics user-id="{{user.id}}" mode="registration_survey"></div>
+
+{% endblock %}

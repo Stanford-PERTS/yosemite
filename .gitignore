@@ -1,0 +1,28 @@
+*.pyc
+*.sublime*
+.DS_Store
+bmh_*
+bulkloader*
+pegasus_data
+
+*.log
+
+# App Engine stuff
+datastore.db
+logs.db*
+search_indexes
+xsrf
+
+.svn
+
+*.md
+*.mdown
+
+node_modules
+
+# concatenated, but uncompressed, static files which are a useless
+# by-product of the concatenate/uglify grunt tasks
+static/js/dist
+static/css/dist
+
+system_notes.txt

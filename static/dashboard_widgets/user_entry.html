@@ -1,0 +1,31 @@
+<td class="select">
+    <input type="checkbox" ng-model="isSelected">
+</td>
+<td class="first_name">
+    <input type="text" ng-model="user.first_name">
+</td>
+<td class="last_name">
+    <input type="text" ng-model="user.last_name">
+</td>
+<td class="phone">
+    <input type="text" ng-model="user.phone">
+</td>
+<td class="registered">
+    <span bo-text="user.registered()"></span>
+</td>
+<td class="owned_schools user_relationships">
+    <div ng-repeat="c in ownedCohorts | orderBy: 'name'" class="school"
+         bindonce="c">
+        <div class="school_label">
+            <span bo-text="c.name"></span>
+        </div>
+        <div class="icon_container">
+            <i class="icon-remove" ng-click="disownCohort(c.id)"
+               ng-show="$root.userType == 'god'"></i>
+        </div>
+    </div>
+</td>
+<td class="verified" tooltip="[[verifiedTooltip]]"
+    ng-class="{warning: user.user_type == 'teacher'}">
+    <span bo-text="user.verified()"></span>
+</td>

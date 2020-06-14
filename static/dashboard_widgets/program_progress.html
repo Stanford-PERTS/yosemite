@@ -1,0 +1,45 @@
+<h2>
+    <a href="#/program/[[ program.id ]]/cohort_progress">
+        [[ program.name ]] ([[ program.abbreviation ]])
+    </a>
+</h2>
+
+<table class="dashboard-table">
+
+    <colgroup>
+        <col ng-repeat="col in columns" class="[[col.colClass]]" span="1"
+             ng-hide="$index == 0">
+    </colgroup>
+
+    <thead>
+        <!-- This first row is essentially categories of columns. The colX
+        classes allow us to apply borders only on certain columns. -->
+        <tr>
+            <th colspan="1" class="col0 col1"><!-- blank --></th>
+            <th colspan="4" class="col2 col3 col4 col5">
+                Classroom Session Status
+            </th>
+            <th class="col6"><!-- blank --></th>
+            <th class="col7"><!-- blank --></th>
+            <th colspan="5" class="col8 col9 col10 col11 col12">
+                Certified Study Eligible Students
+            </th>
+        </tr>
+
+        <tr>
+            <!-- Because this version of the aggregate-cohort-progress -->
+            <!-- doesn't display the first column, the sort-by indices -->
+            <!-- are off by one. A simple + 1 here fixes it. -->
+            <th ng-repeat="col in columns" ng-click="sortBy($index)"
+                ng-hide="$index == 0" class="[['col' + $index]]">
+                <span tooltip="[[col.tooltip]]">[[ col.name ]]</span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="row in rows" aggregate-cohort-progress
+            bindonce="row" show-cohort-column="false"
+            cohort-ids="[[ row.cohortIds ]]"
+            activity-ordinal="[[ row.activityOrdinal ]]"></tr>
+    </tbody>
+</table>

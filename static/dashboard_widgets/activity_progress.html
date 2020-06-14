@@ -1,0 +1,70 @@
+<td class="select col0" ng-show="showProgress=='true'">
+    <input type="checkbox" ng-model="isSelected">
+</td>
+<td class="name col1">
+    <a bo-href="'#/classroom/' + activity.assc_classroom_list[0] + '/classroom_roster'"
+       bo-text="activity.parent_name">
+    </a>
+    <!-- Use the keyboard shortcut "p p i", defined in
+         keyboardShortcuts.js, to show this. -->
+    <span class="id-display" style="display: none" bo-text="activity.id">
+    </span>
+</td>
+<td class="roster col2" ng-class="{warning: !activity.roster_complete}">
+    <span ng-show="activity.roster_complete">Yes</span>
+    <span ng-hide="activity.roster_complete">No</span>
+</td>
+<td class="session col3">
+    <span bo-text="activity.activity_ordinal"></span>
+</td>
+<td class="date col4">
+    <input class="datepickr" tooltip="[[ datepickrTooltip ]]">
+    <br>
+    <input ng-model="activity.scheduled_time" style="display:none" type="text">
+    <input ng-model="activity._twelve_hour_time" class="time" type="text"
+           to-upper-case ng-pattern="timeRegex" placeholder="hh:mm AM/PM">
+</td>
+<!-- this showProgress variable is here b/c we use this widget in multiple
+locations, only some of which need the rull range of data it can display -->
+<td class="status col5">
+    <select styled-select ng-model="activity.status"
+    		class="activity_status [[ activity.interpretedStatus() ]]"
+            ng-options="opt.value as opt.text for opt in statusOptions">
+    </select>
+</td>
+<td class="uncertified [[uncertifiedClass]] col6" ng-show="rightMode == 'stats'"
+    tooltip="[[uncertifiedTooltip]]">
+    <span bo-text="activity.uncertified()"></span>
+</td>
+<td class="study_ineligible [[studyIneligibleClass]] col7" ng-show="rightMode == 'stats'"
+    tooltip="[[studyIneligibleTooltip]]">
+    <span bo-text="activity.studyIneligible()"></span>
+</td>
+<td class="study_eligible [[studyEligibleClass]] col8" ng-show="rightMode == 'stats'"
+    tooltip="[[studyEligibleTooltip]]">
+    <span bo-text="activity.studyEligible()"></span>
+</td>
+<td class="complete [[completeClass]] col9" ng-show="rightMode == 'stats'"
+    tooltip="[[completedTooltip]]">
+    <span bo-text="activity.complete() + ' (' + activity.pctComplete() + ')'"></span>
+</td>
+<td class="makeup_ineligible [[makeupIneligibleClass]] col10" ng-show="rightMode == 'stats'"
+    tooltip="[[makeupIneligibleTooltip]]">
+    <span bo-text="activity.makeupIneligible()"></span>
+</td>
+<td class="makeup_eligible [[makeupEligibleClass]] col11" ng-show="rightMode == 'stats'"
+    tooltip="[[makeupEligibleTooltip]]">
+    <span bo-text="activity.makeupEligible()"></span>
+</td>
+<td class="uncoded [[uncodedClass]] col12" ng-show="rightMode == 'stats'"
+    tooltip="[[uncodedTooltip]]">
+    <span bo-text="activity.uncoded()"></span>
+</td>
+<td class="study_eligible col13" ng-show="rightMode == 'notes'">
+    <span bo-text="activity.studyEligible()"></span>
+</td>
+<td class="notes col14"
+    ng-show="rightMode == 'notes'" colspan="6">
+    <textarea ng-model="activity.notes" placeholder="Enter location of session and other notes here">
+    </textarea>
+</td>

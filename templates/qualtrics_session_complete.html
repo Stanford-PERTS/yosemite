@@ -1,0 +1,49 @@
+{#
+    Students arrive here after finishing a Qualtrics session.
+    Designed to make sure they get progress 100%, no matter what problems may
+    have occurred with the cross_site.gif.
+#}
+
+{% extends "base.html" %}
+
+
+{% block title %}
+Thank You!
+{% endblock %}
+
+
+{% block css %}
+
+<!-- qualtrics-based stylesheet -->
+<link rel="stylesheet" href="/static/css/students.css">
+
+<!-- don't use any of the normal css stylesheets -->
+
+{% endblock %}
+
+
+{% block header %}
+
+<!-- Custom fonts -->
+<script type="text/javascript" src="//use.typekit.net/qnb2yzi.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="full-container students-paths">
+    <div id="header"></div>
+    <div class="outer-container">
+        <div class="inner-container">
+            <h1>Thank you for participating!</h1>
+            <p>You're all done for today. You may close your browser window.</p>
+         </div>
+    </div>
+    <div id="footer">
+        <div class="foot-text">&copy; 2017 Stanford University. All Rights Reserved.</div>
+    </div>
+</div>
+
+{% endblock %}

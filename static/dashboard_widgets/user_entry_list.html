@@ -1,0 +1,60 @@
+<div class="row" ng-show="displayEmailList == true">
+    <div class="span12">
+        <fieldset>
+            <legend>
+                Email addresses of all educators in this category. Copy and paste
+                into the <strong>To:</strong> field of an email.
+            </legend>
+            <div class="well" style="word-wrap:break-word;">
+                <span ng-repeat="user in userEmails">&nbsp;[[ user.login_email ]],</span>
+            </div>
+        </fieldset>
+    </div>
+</div>
+
+<div class="row dashboard-table-controls">
+    <div class="span12">
+        <input type="text" ng-model="searchText"
+               placeholder="Search names...">
+        <span ng-show="$root.userType == 'god'">
+            <select chosen-select select-options="availableCohorts"
+                    ng-options="c as c.name for c in availableCohorts"
+                    ng-model="newAdminCohort" required
+                    ng-disabled="selectedList.length == 0"
+                    data-placeholder="Make Owner of School..."></select>
+        </span>
+
+        <button class="icon-envelope icon_button" type="button" ng-click="openDialog()"
+                ng-disabled="selectedList.length == 0"></button>
+        <button class="icon-trash icon_button" ng-disabled="selectedList.length == 0" 
+                ng-show="$root.userType == 'god'"
+                ng-click="deleteSelectedUsers()"></button>
+    </div>
+</div>
+
+<table class="dashboard-table">
+    <colgroup>
+        <col ng-repeat="col in columns" class="[[col.colClass]]" span="1">
+    </colgroup>
+    <thead>
+        <tr ng-class="{'reverse-sort': reverseSort}">
+            <th ng-repeat="col in columns" ng-click="sortBy($index)"
+                ng-class="{sortable: col.sortable, 'sorting-active': sortedColumn == $index}">
+                [[ col.name ]]
+                <input type="checkbox" ng-show="col.colClass == 'select'"
+                       ng-model="allSelected"
+                       ng-change="toggleSelectAll(allSelected)">
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="user in pageList" user-entry bindonce="user"
+            user-id="[[ user.id ]]"></tr>
+    </tbody>
+</table>
+
+<div class="empty-table-hint" ng-show="searchList.length == 0">
+    [[ emptyTableMessage ]]
+</div>
+
+<div table-page-nav></div>

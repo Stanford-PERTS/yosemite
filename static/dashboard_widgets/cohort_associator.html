@@ -1,0 +1,6 @@
+<form name="adminPromotionForm">
+    <select chosen-select select-options="availableCohorts"
+            ng-options="c as c.name for c in availableCohorts"
+            ng-model="newAdminCohort" required
+            data-placeholder="Add School..."></select>
+</form>

@@ -1,0 +1,23 @@
+{# User account management #}
+
+{% extends "base.html" %}
+
+{% block header %}
+
+<link rel="stylesheet" href="/static/css/dashboard.css">
+
+<script src="/static/js/dashboard.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<div>
+    <div user-basics user-id="{{ user.id }}"></div>
+    <br>
+    <div change-password user-id="{{ user.id }}"
+         ng-show="user.auth_type == 'direct'"></div>
+</div>
+
+    
+{% endblock %}

@@ -1,0 +1,6 @@
+<div ng-repeat="user in userList" style="border-bottom:1px solid black;margin-bottom:20px">
+    <div user-basics user-id="[[ user.id ]]"></div>
+    <br>
+    <div change-password user-id="[[ user.id ]]"
+         ng-show="user.auth_type == 'direct'"></div>
+</div>

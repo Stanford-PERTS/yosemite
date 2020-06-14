@@ -1,0 +1,204 @@
+{# Search the whole data store! Only accessible to gods. #}
+
+{% extends "base.html" %}
+
+{% block header %}
+<script>
+
+
+function SearchController($scope, $location, $pertsAjax) {
+    'use strict';
+
+    var base_link = "https://appengine.google.com/datastore/edit?app_id=s~pegasusplatform";
+
+    // bind search
+    $scope.runSearch = function(query) {
+        var request;
+
+        // query
+        query = query ? query : $scope.query;
+        request = '/api/search/' + query;
+
+        $pertsAjax({url: request}).then(function (response) {
+            $scope.data = response;
+
+            if ( response[0] ){
+                $scope.title = response[0].id;  
+                $scope.edit_prompt = "edit";
+                $scope.edit_link = base_link + "&key=" + response[0].entity_key;        
+            } else {
+                $scope.title = "No matches found";                
+                $scope.edit_prompt = "";
+                $scope.edit_link = "";       
+            }
+        });
+    }
+
+    // set hash
+    $scope.setHash = function(hash) {
+        $location.hash(hash);
+    }
+
+    // bind url
+    $scope.$watch(function() {
+        return $location.hash();
+    }, function(query) {
+        $scope.query = query;
+        $scope.runSearch(query);
+        window.scrollTo(0,0);
+    });
+
+    // reload when leaving
+    // hack to overcome html5 routing hack
+    $scope.$watch(function() {
+        return $location.path();
+    }, function(path) {
+        if ( path.search("entity") == -1 ) {
+            window.location.href = path;
+        }
+    });
+
+    // initialize
+    $pertsAjax({url: '/cron/index'});        // update index
+    $('#query').focus();                    // cursor in text
+}
+
+
+// Hack
+// This makes the back button work when you follow an id link
+// not sure why exactly, except that angular modifies hashes from
+// #something to ##something when this is off.
+PertsApp.config(['$locationProvider', function($locationProvider){
+    $locationProvider.html5Mode(true).hashPrefix('!');
+}]);
+
+
+PertsApp.filter('clean', function() {
+    // prettify the json
+    'use strict';
+
+    return function(input) {
+        var pattern, replace, cache;
+
+        if ( input ) {
+
+            // opening and closing brackets
+            pattern = /\[[\s\S]*\{([\s\S]*)\}[\s\S]*\]/;
+            replace = "$1";
+            input = input.replace(pattern, replace);
+
+            // multiline arrays
+            pattern = /([^,])\n/g;
+            replace = "$1";
+            input = input.replace(pattern, replace);
+
+            cache = "";
+            while( cache !== input ){
+                cache = input;
+                pattern = /(\[[^\]]*)\n/g;
+                replace = "$1";
+                input = input.replace(pattern, replace);                
+            }
+
+            // trim
+            pattern = /[\s]*(.*)[\s]*(\n|$)/g;
+            replace = "$1\n";
+            input = input.replace(pattern, replace);
+
+            // clean whitespace
+            pattern = /[\t ]+/g;
+            replace = " ";
+            input = input.replace(pattern, replace);
+
+            // remove boring keys
+            pattern = /.{0,3}(is_test|deleted|entity_key)[^\n]*\n/g;
+            replace = "";
+            input = input.replace(pattern, replace);
+
+            // remove trailing commas
+            pattern = /,\n/g;
+            replace = "\n";
+            input = input.replace(pattern, replace);
+
+            // Sort
+            input = input.split("\n")
+            input = input.sort()
+            input = input.join("\n") + "\n";
+
+            // to table
+            pattern = /"([^"]*)":(.*)\n/g;
+            replace = "<tr><td>$1</td><td>$2</td></tr>";
+            input = input.replace(pattern, replace);
+
+            // Dates
+            pattern = /"([0-9]{4}-[0-9]{2}-[0-9]{2} ?[0-9:.]*)"/g;
+            replace = function(match, p1, offset, string){
+                        // p1 is nondigits, p2 digits, and p3 non-alphanumerics
+                        return "" +
+                            "<span class='text-warning'>" + 
+                                pretty_date(p1) + 
+                            "</span>" + " " +
+                            "<small>(" + p1 + ")</small>";
+                      };
+            input = input.replace(pattern, replace);
+
+            // true
+            pattern = /(true)/g;
+            replace = "<span class='text-info'>$1</span>";
+            input = input.replace(pattern, replace);
+
+
+            // false
+            pattern = /(false)/g;
+            replace = "<span class='text-error'>$1</span>";
+            input = input.replace(pattern, replace);
+
+            // ids to links
+            pattern = /"([^"]*_[A-Za-z0-9]{20})"/g;
+            replace = "<a href='#id: $1' title='click to search for $1'>...</a>";
+            input = input.replace(pattern, replace);
+
+            // Strings            
+            pattern = /"([^"]*)"/g;
+            replace = "<span class='text-success'>$1</span>";
+            input = input.replace(pattern, replace);
+
+            // de-emphasize boring content
+            pattern = /(null|\[\])/g;
+            replace = "<small>$1</small>";
+            input = input.replace(pattern, replace);
+            
+        }
+
+        return input;
+    };
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<form name="search" ng-controller="SearchController" ng-submit='setHash(query)'>
+    <input id="query" ng-model="query" class="input-xxlarge" placeholder="search" >
+    </input>
+    <input type="submit" value="Search"/>
+    <br/><br/>
+    <h4>[[title]] 
+        <small>
+            <a 
+                title = "click to edit, only works in production" 
+                target = "_blank"
+                ng-href = [[edit_link]]
+            >
+                [[edit_prompt]]
+            </a>
+        </small> 
+    </h4>
+    <table class="table table-condensed">
+        <tbody ng-bind-html="data | json: '' | clean"></tbody>
+    </table>
+</form>
+    
+{% endblock %}

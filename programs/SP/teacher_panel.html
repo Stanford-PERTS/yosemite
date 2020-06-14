@@ -1,0 +1,22 @@
+    {% extends "/templates/base.html" %}
+
+{% block title %}
+Teacher Panel for {{ program_abbreviation }}
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+    <div>
+    {% if user.user_type != 'teacher' %}
+        <p>Your account is set up!</p>
+        <p>Go to <a href="/d">the dashboard</a></p>
+    {% else %}
+        <p>Thank you for registering.</p>
+        <p>Please wait for your account to be verified.</p>
+    {% endif %}
+    </div>
+
+{% endblock %}

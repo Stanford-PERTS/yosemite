@@ -1,0 +1,1013 @@
+{# Collection of tools for gods. #}
+
+{% extends "base.html" %}
+
+{% block title %}
+God
+{% endblock %}
+
+{% block header %}
+
+<script>
+// used in some populate calls
+// cam presumes this is safe b/c the server only lets gods see this page anyway
+var userId = '{{ user.id }}';
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<fieldset>
+    <legend>Download Data CSVs</legend>
+    <p>
+       Go to the <a href="http://bigquery.cloud.google.com">BigQuery panel</a> to export user and PD CSVs.
+       The documentation can be found <a href="https://docs.google.com/document/d/1lPvVUkQ71I5qgj207CzoVDSBv0JKWTv3jtRvKEHMZV0/edit?usp=sharing">here</a>.
+    </p>
+</fieldset>
+
+<fieldset>
+    <legend>Set user type</legend>
+    <form id="set_user_type" onsubmit="return false;">
+        <label for="set_user_type__user_id">user id</label>
+        <input id="set_user_type__user_id">
+        <label for="set_user_type__user_type">user type</label>
+        <select id="set_user_type__user_type">
+            <option value="student">student</option>
+            <option value="teacher">teacher</option>
+            <option value="school_admin">school_admin</option>
+            <option value="researcher">researcher</option>
+        </select>
+        <button>submit</button>
+    </form>
+    <script type="text/javascript">
+
+$('#set_user_type button').click(function () {
+    'use strict';
+    var userId = $('#set_user_type__user_id').val();
+    var userType = $('#set_user_type__user_type').val();
+    $.ajax('/api/put/user/' + userId, {
+        dataType: 'json',
+        data: {user_type: userType}
+    });
+});
+
+    </script>
+</fieldset>
+
+<fieldset class="alpha four columns">
+    <legend>Create Program</legend>
+    <p>Note that the program code must match the name of the program folder.</p>
+    <form id="create_program" onsubmit="return false;">
+        <label for="create_program__name">name</label>
+        <input id="create_program__name"
+               name="create_program__name"
+               type="text"
+               required>
+        <label for="create_program__abbreviation">code</label>
+        <input id="create_program__abbreviation"
+               ng-model="create_program__abbreviation"
+               type="text">
+        <label for="create_program__is_test">is test</label>
+        <input id="create_program__is_test"
+               ng-model="create_program__abbreviation"
+               type="checkbox"><br>
+        <button ng-disabled="createProgramForm.$invalid">
+            submit
+        </button>
+    </form>
+    <script type="text/javascript">
+
+$('#create_program button').click(function () {
+    'use strict';
+    var name = $('#create_program__name').val();
+    var abbreviation = $('#create_program__abbreviation').val();
+    $.ajax('/api/put/program', {
+        dataType: 'json',
+        data: {name: name, abbreviation: abbreviation}
+    });
+});
+
+    </script>
+</fieldset>
+
+<fieldset>
+    <legend>Add email to Queue</legend>
+    <form id="email" onsubmit="return false;">
+
+        <label for="email__to_address">to address</label>
+        <input id="email__to_address" placeholder="">
+
+        <label for="email__from_address">from address (must be a google admin)</label>
+        <input id="email__from_address" value="">
+
+        <label for="email__reply_to">reply to (can be anyone)</label>
+        <input id="email__reply_to">
+
+        <label for="email__subject">subject</label>
+        <input id="email__subject">
+
+        <label for="email__body">body</label>
+        <textarea id="email__body"></textarea>
+
+        <label for="email__scheduled_date">send date</label>
+        <input id="email__scheduled_date" placeholder="YYYY-MM-DD">
+
+        <button>submit</button>
+    </form>
+    <script type="text/javascript">
+
+$('#email button').click(function () {
+    'use strict';
+    var to_address = $('#email__to_address').val();
+    var from_address = $('#email__from_address').val();
+    var reply_to = $('#email__reply_to').val();
+    var subject = $('#email__subject').val();
+    var body = $('#email__body').val();
+    var scheduled_date = $('#email__scheduled_date').val();
+    $.ajax('/api/put/email', {
+        dataType: 'json',
+        data: {
+            to_address:     to_address,
+            from_address:   from_address,
+            reply_to:       reply_to,
+            subject:        subject,
+            body:           body,
+            scheduled_date:      scheduled_date
+        },
+        success: function (response) {
+            setTimeout(function () {
+                $.ajax('/cron/send_pending_email', {
+                    success: function (response) {
+                        console.log(response);
+                    }
+                });
+            }, 2000);
+        }
+    });
+});
+    </script>
+</fieldset>
+
+<fieldset>
+    <legend>Show scheduled reminders</legend>
+    <form id="show_reminders" action='/api/show_reminders', method="get">
+        <input name="date" placeholder="YYYY-MM-DD"></input>
+        <input type="submit" value="show reminders"></input>
+    </form>
+</fieldset>
+
+<fieldset>
+    <legend>Delete Everything (in dev)</legend>
+    <form id="delete_everything" onsubmit="return false;">
+        <button>submit</button>
+    </form>
+    <script type="text/javascript">
+
+$('#delete_everything button').click(function () {
+    'use strict';
+    var name = $('#delete_everything').val();
+    $('#delete_everything').append('<span>Working...&nbsp;&nbsp;</span.');
+    $.ajax('/api/delete_everything', {
+        dataType: 'json',
+        data: {name: name},
+        success: function (response) {
+            $('#delete_everything').append('<span>Will refresh in 2 seconds to re-create god.</span.');
+            setTimeout(function () {
+                window.location.reload(true);  // true means don't just reload from cache
+            }, 2000);
+        }
+    });
+});
+
+    </script>
+</fieldset>
+
+<fieldset>
+    <legend>Populate</legend>
+    <p> Populate the database with example data for testing </p>
+    <pre id="commands"></pre>
+    <form id="populate" onsubmit="return false;">
+        <button>submit</button>
+        <p id="populate_development_warning" style="display:None">
+            This function not available in production.
+        </p>
+        <p id="populate_twice_warning" style="display:None">
+            This datastore already has programs defined. Clear all data before
+            populating.
+        </p>
+    </form>
+    <script type="text/javascript">
+
+// Api commands 
+//
+// These will be called sequentially.  Responses will be aggregated
+// in the responses object. Bracketed text will be run as code and 
+// replaced with the output of that code. 
+//
+// e.g.     'command/[%5+5%]' becomes 'command/10'
+// 
+// This mechanism can be used to reference ids and other responses 
+// obtained from previous commands which are available in the 
+// responses object.
+//
+// e.g.     'command/[%responses.teacher.id%]'
+//
+// Adding Commands
+// Adding new commands is straightforward, run the current script and
+// then run new commands recording API calls as you go.  Paste these
+// new API commands at the end of the command list.
+
+var commands = [
+    // create a few schools
+    {
+        'name': 'schoolA',
+        'description': 'Add AGN school',
+        'command':
+            '/api/put/school?name=Aspera North High School'
+    },
+    {
+        'name': 'schoolB',
+        'description': 'Add BGN school',
+        'command':
+            '/api/put/school?name=Bogart Film School'
+    },
+    {
+        'name': 'schoolC',
+        'description': 'Add CGN school',
+        'command':
+            '/api/put/school?name=Cooperstown Academy'
+    },
+    {
+        'name': 'schoolD',
+        'description': 'Add DGN school',
+        'command':
+            '/api/put/school?name=Downers Grove North'
+    },
+    // create a program
+    {
+        'name': 'program',
+        'description': 'Add "Students\' Paths" Program',
+        'command':
+            '/api/put/program?abbreviation=SP&name=Students\'%20Paths'
+    },
+    // create some cohorts
+    {
+        'name': 'cohortA',
+        'description': 'Create a cohort in "AGN" running "Students\' Paths" program with code "trout viper"',
+        'command':
+            '/api/put/cohort?code=trout%20viper&name=Aspera North High School&program=[%responses.program.data.id%]&school=[%responses.schoolA.data.id%]'
+    },
+    {
+        'name': 'cohortB',
+        'description': 'Create a cohort in "BGN" running "Students\' Paths" program with random code',
+        'command':
+            '/api/put/cohort?name=Bogart Film School&program=[%responses.program.data.id%]&school=[%responses.schoolB.data.id%]'
+    },
+    {
+        'name': 'cohortC',
+        'description': 'Create a cohort in "CGN" running "Students\' Paths" program with code "bronze fox"',
+        'command':
+            '/api/put/cohort?code=bronze%20fox&name=Cooperstown Academy&program=[%responses.program.data.id%]&school=[%responses.schoolC.data.id%]'
+    },
+    {
+        'name': 'cohortD',
+        'description': 'Create a cohort in "DGN" running "Students\' Paths" program with random code',
+        'command':
+            '/api/put/cohort?name=Downers Grove North&program=[%responses.program.data.id%]&school=[%responses.schoolD.data.id%]'
+    },
+    // create school admins
+    {
+        'name': 'school_adminA',
+        'description': 'Add , password: "12345678"',
+        'command':
+            '/api/put/user?program=[%responses.program.data.id%]&plaintext_password=12345678&user_type=school_admin&login_email=registration_complete=true&first_name=Amy&last_name=Ackermann'
+    },
+    {
+        'name': 'school_adminB',
+        'description': 'Add , password: "12345678"',
+        'command':
+            '/api/put/user?program=[%responses.program.data.id%]&plaintext_password=12345678&user_type=school_admin&login_email=registration_complete=true&first_name=Bob&last_name=Billings'
+    },
+    {
+        'name': 'school_adminC',
+        'description': 'Add , password: "12345678"',
+        'command':
+            '/api/put/user?program=[%responses.program.data.id%]&plaintext_password=12345678&user_type=school_admin&login_email=registration_complete=true&first_name=Cecilia&last_name=Cho'
+    },
+    {
+        'name': 'school_adminD',
+        'description': 'Add , password: "12345678"',
+        'command':
+            '/api/put/user?program=[%responses.program.data.id%]&plaintext_password=12345678&user_type=school_admin&login_email=registration_complete=true&first_name=Doug&last_name=Downs'
+    },
+    // set the school_admins as an owner of their cohorts
+    {
+        'name': 'school_adminA_own_cohortA',
+        'description': ' owns "trout viper" cohort',
+        'command':
+            '/api/set_owner/user/[%responses.school_adminA.data.id%]/cohort/[%responses.cohortA.data.id%]'
+    },
+    {
+        'name': 'school_adminB_own_cohortB',
+        'description': ' owns cohortB',
+        'command':
+            '/api/set_owner/user/[%responses.school_adminB.data.id%]/cohort/[%responses.cohortB.data.id%]'
+    },
+    {
+        'name': 'school_adminC_own_cohortC',
+        'description': ' owns "bronze fox" cohort',
+        'command':
+            '/api/set_owner/user/[%responses.school_adminC.data.id%]/cohort/[%responses.cohortC.data.id%]'
+    },
+    {
+        'name': 'school_adminD_own_cohortD',
+        'description': ' owns cohortD',
+        'command':
+            '/api/set_owner/user/[%responses.school_adminD.data.id%]/cohort/[%responses.cohortD.data.id%]'
+    },
+
+    // Data For Cohort A
+    
+    // have the school_admin create two classrooms
+    // (student activities come back in the server resonse as a property of the
+    // classroom)
+    {
+        'name': 'englishA',
+        'description': 'Create classroom "English 101" in cohortA',
+        'command':
+            '/api/put/classroom?teacher_email=%]'
+    },
+    {
+        'name': 'mathA',
+        'description': 'Create classroom "Math 101"',
+        'command':
+            '/api/put/classroom?teacher_email=%]'
+    },
+    // have school_adminA schedule those activities
+    {
+        'name': 'schedule_englishA_activity_1',
+        'description': 'Schedule student activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.englishA.data._student_activity_list[0].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminA.data.id%]'
+    },
+    {
+        'name': 'schedule_englishA_activity_2',
+        'description': 'Schedule activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.englishA.data._student_activity_list[1].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminA.data.id%]'
+    },
+    {
+        'name': 'schedule_mathA_activity_1',
+        'description': 'Schedule student activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.mathA.data._student_activity_list[0].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminA.data.id%]'
+    },
+    {
+        'name': 'schedule_mathA_activity_2',
+        'description': 'Schedule activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.mathA.data._student_activity_list[1].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminA.data.id%]'
+    },
+    // Create 5 students for each classroom in the test program so we can aggregate on them
+    // englishA:
+    {
+        'name': 'studentA1',
+        'description': 'Create a student for the test program.',
+        'command':
+        '/api/put/user?classroom=[%responses.englishA.data.id%]&birth_date=2010-01-01&first_name=Ming&last_name=one&user_type=student'
+    },
+    {
+        'name': 'studentA2',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishA.data.id%]&birth_date=2010-01-01&first_name=Lupita&last_name=two&user_type=student'
+    },
+    {
+        'name': 'studentA3',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishA.data.id%]&birth_date=2010-01-01&first_name=Alexander&last_name=three&user_type=student'
+    },
+    {
+        'name': 'studentA4',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishA.data.id%]&birth_date=2010-01-01&first_name=Nils&last_name=four&user_type=student'
+    },
+    {
+        'name': 'studentA5',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishA.data.id%]&birth_date=2010-01-01&first_name=Molly&last_name=five&user_type=student'
+    },
+    // mathA
+    {
+        'name': 'studentA6',
+        'description': 'Create a student for the test program.',
+        'command':
+        '/api/put/user?classroom=[%responses.mathA.data.id%]&birth_date=2010-01-01&first_name=student&last_name=six&user_type=student'
+    },
+    {
+        'name': 'studentA7',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathA.data.id%]&birth_date=2010-01-01&first_name=student&last_name=seven&user_type=student'
+    },
+    {
+        'name': 'studentA8',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathA.data.id%]&birth_date=2010-01-01&first_name=student&last_name=eight&user_type=student'
+    },
+    {
+        'name': 'studentA9',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathA.data.id%]&birth_date=2010-01-01&first_name=student&last_name=nine&user_type=student'
+    },
+    {
+        'name': 'studentA10',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathA.data.id%]&birth_date=2010-01-01&first_name=student&last_name=ten&user_type=student'
+    },
+    
+
+    // Create some program data for the aggregator
+    {
+        'name': 'aggregation_data1',
+        'description': 'creating pd for the aggregator',
+        'command':
+            '/api/put/pd?program=[%responses.program.data.id%]&activity_ordinal=1&scope=[%responses.studentA1.data.id%]&variable=s1__progress&value=0'
+    },
+    {
+        'name': 'aggregation_data2',
+        'description': '...',
+        'command':
+            '/api/put/pd?program=[%responses.program.data.id%]&activity_ordinal=1&scope=[%responses.studentA2.data.id%]&variable=s1__progress&value=10'
+    },
+    {
+        'name': 'aggregation_data3',
+        'description': '...',
+        'command':
+            '/api/put/pd?program=[%responses.program.data.id%]&activity_ordinal=1&scope=[%responses.studentA3.data.id%]&variable=s1__progress&value=20'
+    },
+    {
+        'name': 'aggregation_data4',
+        'description': '...',
+        'command':
+            '/api/put/pd?program=[%responses.program.data.id%]&activity_ordinal=1&scope=[%responses.studentA4.data.id%]&variable=s1__progress&value=30'
+    },
+    {
+        'name': 'aggregation_data5',
+        'description': '...',
+        'command':
+            '/api/put/pd?program=[%responses.program.data.id%]&activity_ordinal=1&scope=[%responses.studentA5.data.id%]&variable=s1__progress&value=100'
+    },
+
+    // Data For Cohort B
+    
+    // have the school_admin create two classrooms
+    // (student activities come back in the server resonse as a property of the
+    // classroom)
+    {
+        'name': 'englishB',
+        'description': 'Create classroom "English 201" in cohortB',
+        // 'delay': 1,
+        'command':
+            '/api/put/classroom?teacher_email=%]&name=Civil Engineering (Brown 9)&impersonate=[%responses.school_adminB.data.id%]'
+    },
+    {
+        'name': 'mathB',
+        'description': 'Create classroom "Math 201" in cohortB',
+        // 'delay': 1,
+        'command':
+            '/api/put/classroom?teacher_email=%]&name=Linear Algebra (Bronson 2)&impersonate=[%responses.school_adminB.data.id%]'
+    },
+    // have the school_adminB schedule those activities
+    {
+        'name': 'schedule_englishB_activity_1',
+        'description': 'Schedule student activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.englishB.data._student_activity_list[0].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminB.data.id%]'
+    },
+    {
+        'name': 'schedule_englishB_activity_2',
+        'description': 'Schedule activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.englishB.data._student_activity_list[1].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminB.data.id%]'
+    },
+    {
+        'name': 'schedule_mathB_activity_1',
+        'description': 'Schedule student activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.mathB.data._student_activity_list[0].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminB.data.id%]'
+    },
+    {
+        'name': 'schedule_mathB_activity_2',
+        'description': 'Schedule activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.mathB.data._student_activity_list[1].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminB.data.id%]'
+    },
+    // Create 5 students for each classroom in the test program so we can aggregate on them
+    // englishA:
+    {
+        'name': 'studentB1',
+        'description': 'Create a student for the test program.',
+        'command':
+        '/api/put/user?classroom=[%responses.englishB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=one&user_type=student'
+    },
+    {
+        'name': 'studentB2',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=two&user_type=student'
+    },
+    {
+        'name': 'studentB3',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=three&user_type=student'
+    },
+    {
+        'name': 'studentB4',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=four&user_type=student'
+    },
+    {
+        'name': 'studentB5',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=five&user_type=student'
+    },
+    // mathA
+    {
+        'name': 'studentB6',
+        'description': 'Create a student for the test program.',
+        'command':
+        '/api/put/user?classroom=[%responses.mathB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=six&user_type=student'
+    },
+    {
+        'name': 'studentB7',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=seven&user_type=student'
+    },
+    {
+        'name': 'studentB8',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=eight&user_type=student'
+    },
+    {
+        'name': 'studentB9',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=nine&user_type=student'
+    },
+    {
+        'name': 'studentB10',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathB.data.id%]&birth_date=2010-01-01&first_name=student&last_name=ten&user_type=student'
+    },
+
+    // Data For Cohort C
+    
+    // have the school_admin create two classrooms
+    // (student activities come back in the server resonse as a property of the
+    // classroom)
+    {
+        'name': 'englishC',
+        'description': 'Create classroom "English 301" in cohortC',
+        // 'delay': 1,
+        'command':
+            '/api/put/classroom?teacher_email=%]&name=Poetics (Carhart)&impersonate=[%responses.school_adminC.data.id%]'
+    },
+    {
+        'name': 'mathC',
+        'description': 'Create classroom "Math 101" in cohortC',
+        // 'delay': 1,
+        'command':
+            '/api/put/classroom?teacher_email=%]&name=Rhetoric (Cicero Section 10)&impersonate=[%responses.school_adminC.data.id%]'
+    },
+    // have the school_adminC schedule those activities
+    {
+        'name': 'schedule_englishC_activity_1',
+        'description': 'Schedule student activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.englishC.data._student_activity_list[0].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminC.data.id%]'
+    },
+    {
+        'name': 'schedule_englishC_activity_2',
+        'description': 'Schedule activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.englishC.data._student_activity_list[1].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminC.data.id%]'
+    },
+    {
+        'name': 'schedule_mathC_activity_1',
+        'description': 'Schedule student activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.mathC.data._student_activity_list[0].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminC.data.id%]'
+    },
+    {
+        'name': 'schedule_mathC_activity_2',
+        'description': 'Schedule activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.mathC.data._student_activity_list[1].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminC.data.id%]'
+    },
+    // Create 5 students for each classroom in the test program so we can aggregate on them
+    // englishA:
+    {
+        'name': 'studentC1',
+        'description': 'Create a student for the test program.',
+        'command':
+        '/api/put/user?classroom=[%responses.englishC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=one&user_type=student'
+    },
+    {
+        'name': 'studentC2',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=two&user_type=student'
+    },
+    {
+        'name': 'studentC3',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=three&user_type=student'
+    },
+    {
+        'name': 'studentC4',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=four&user_type=student'
+    },
+    {
+        'name': 'studentC5',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=five&user_type=student'
+    },
+    // mathA
+    {
+        'name': 'studentC6',
+        'description': 'Create a student for the test program.',
+        'command':
+        '/api/put/user?classroom=[%responses.mathC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=six&user_type=student'
+    },
+    {
+        'name': 'studentC7',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=seven&user_type=student'
+    },
+    {
+        'name': 'studentC8',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=eight&user_type=student'
+    },
+    {
+        'name': 'studentC9',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=nine&user_type=student'
+    },
+    {
+        'name': 'studentC10',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathC.data.id%]&birth_date=2010-01-01&first_name=student&last_name=ten&user_type=student'
+    },
+
+    // Data For Cohort D
+    
+    // have the school_admin create two classrooms
+    // (student activities come back in the server resonse as a property of the
+    // classroom)
+    {
+        'name': 'englishD',
+        'description': 'Create classroom "English 401" in cohortD',
+        // 'delay': 1,
+        'command':
+            '/api/put/classroom?teacher_email=%]&name=Microbiology (Dowling)&impersonate=[%responses.school_adminD.data.id%]'
+    },
+    {
+        'name': 'mathD',
+        'description': 'Create classroom "Math 401"',
+        // 'delay': 1,
+        'command':
+            '/api/put/classroom?teacher_email=%]&name=Macroeconomics (Draper)&impersonate=[%responses.school_adminD.data.id%]'
+    },
+    // have the school_adminD schedule those activities
+    {
+        'name': 'schedule_englishD_activity_1',
+        'description': 'Schedule student activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.englishD.data._student_activity_list[0].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminD.data.id%]'
+    },
+    {
+        'name': 'schedule_englishD_activity_2',
+        'description': 'Schedule activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.englishD.data._student_activity_list[1].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminD.data.id%]'
+    },
+    {
+        'name': 'schedule_mathD_activity_1',
+        'description': 'Schedule student activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.mathD.data._student_activity_list[0].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminD.data.id%]'
+    },
+    {
+        'name': 'schedule_mathD_activity_2',
+        'description': 'Schedule activities for today, [%(new Date()).toDateString("local")%]',
+        'command':
+            '/api/put/activity/[%responses.mathD.data._student_activity_list[1].id%]?scheduled_date=[%(new Date()).toDateString("local")%]&impersonate=[%responses.school_adminD.data.id%]'
+    },
+    // Create 5 students for each classroom in the test program so we can aggregate on them
+    // englishA:
+    {
+        'name': 'studentD1',
+        'description': 'Create a student for the test program.',
+        'command':
+        '/api/put/user?classroom=[%responses.englishD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=one&user_type=student'
+    },
+    {
+        'name': 'studentD2',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=two&user_type=student'
+    },
+    {
+        'name': 'studentD3',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=three&user_type=student'
+    },
+    {
+        'name': 'studentD4',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=four&user_type=student'
+    },
+    {
+        'name': 'studentD5',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.englishD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=five&user_type=student'
+    },
+    // mathA
+    {
+        'name': 'studentD6',
+        'description': 'Create a student for the test program.',
+        'command':
+        '/api/put/user?classroom=[%responses.mathD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=six&user_type=student'
+    },
+    {
+        'name': 'studentD7',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=seven&user_type=student'
+    },
+    {
+        'name': 'studentD8',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=eight&user_type=student'
+    },
+    {
+        'name': 'studentD9',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=nine&user_type=student'
+    },
+    {
+        'name': 'studentD10',
+        'description': '...',
+        'command':
+        '/api/put/user?classroom=[%responses.mathD.data.id%]&birth_date=2010-01-01&first_name=student&last_name=ten&user_type=student'
+    },
+
+    // Aggregate
+    {
+        'name': 'aggregate',
+        'description': 'aggregate',
+        'command': '/cron/aggregate'
+    },
+    // populate search index
+    {
+        'name': 'search_index',
+        'description': 'populate search index',
+        'command':
+            '/cron/index'
+    }
+];
+
+
+$('#populate button').click(function () {
+    'use strict';
+    // Check if in development
+    if (!isDevelopment()) {
+        $('#populate_development_warning').show();
+        return;
+    }
+
+    var programsExist = {{ 'true' if programs_exist else 'false'}};
+    if (programsExist) {
+        $('#populate_twice_warning').show();
+        return;
+    }
+
+    var errorsOccurred = false;
+
+    // parse commands
+    var parseCommand = function (text, responses) {
+        
+        // extraction pattern
+        //
+        // This regex will grab both the string to be replaced which
+        // includes brackets and the string to be executed which is
+        // within the string to be replaced and has no brackets.
+        // 
+        // e.g. 
+        //      'command/[%5+5%]/more'  ->  ['[%5+5%]', '5+5']
+        //
+        var pattern = /\[%([^%]*)%\]/;
+
+        // find all
+        var match;
+        while (match = pattern.exec(text)) {
+            // evaluate and replace
+            text = text.replace(match[0], eval(match[1]));
+        }
+        return text;
+    };
+
+
+    // api calls
+    var run = function (commands, responses) {
+
+        // unpack
+        var next = commands.shift();
+        var name = next.name;
+        var description = parseCommand(next.description, responses);
+        var command = parseCommand(next.command, responses);
+        // Delay lets us avoid GAE's sometimes inconsistent results;
+        // only used when creating something and then immediately
+        // getting it through a separate call.
+        var delay = next.delay || 0;
+
+        // api call
+        $.get(command, function (response) {
+            var label;
+            if (response.success) {
+                label = 'success';
+            } else {
+                label = '<span style="color:red">failed</span>';
+                errorsOccurred = true;
+            }
+
+            $('#commands').append(description + '...' + label + '\n');
+
+            // record responses
+            responses[name] = response;
+
+            // recurse
+            if (commands.length > 0) {
+                setTimeout(function () {
+                    run(commands, responses);
+                }, delay * 1000);
+            } else {
+                if (errorsOccurred) {
+                    $('#commands').append('COMPLETE WITH ERRORS\n');
+                } else {
+                    $('#commands').append('COMPLETE\n');
+                }
+            }
+        });
+    };
+
+    // initiate
+    run(commands, {});
+});
+
+    </script>
+</fieldset>
+
+<script>
+PertsApp.controller('CorrectPdController', [
+    '$scope', '$pertsAjax', '$forEachAsync',
+    function ($scope, $pertsAjax, $forEachAsync) {
+        $scope.successfulWrites = [];
+        $scope.failedWrites = [];
+
+        var inputValid = function () {
+            var inputValid = true;
+            try {
+                $scope.pdList = JSON.parse($scope.pdsToPut);
+            } catch (e) {
+                alert("Invalid JSON input.");
+                inputValid = false;
+            }
+
+            forEach($scope.pdList, function (pd) {
+                if (!inputValid) { return; }
+                if (!pd.program || !pd.scope || !pd.variable || !pd.value) {
+                    inputValid = false;
+                    alert("Missing parameters.");
+                }
+            });
+
+            return inputValid;
+        };
+
+        $scope.start = function () {
+            if (!inputValid()) { return; }
+
+            var put = function (pd) {
+                return $pertsAjax({
+                    url: '/api/put/pd',
+                    params: {
+                        impersonate: pd.scope,
+                        program: pd.program,
+                        activity_ordinal: pd.activity_ordinal,
+                        scope: pd.scope,
+                        variable: pd.variable,
+                        value: pd.value
+                    }
+                }).then(function successCallback(responsePd) {
+                    $scope.successfulWrites.push(responsePd);
+                }, function errorCallback() {
+                    $scope.failedWrites.push(pd);
+                    console.error("error writing pd", pd, arguments);
+                });
+            }
+
+            $forEachAsync($scope.pdList, put, 'serial').then(function () {
+                alert("Finished writing corrected pd.");
+            });
+        };
+    }
+]);
+</script>
+
+<fieldset ng-controller="CorrectPdController">
+    <legend>Correct PD</legend>
+    <p>Puts each pd one by one. If there are a lot of pds, this may take
+    awhile.</p>
+
+    <p>Pds to put. JSON list of pd objects, including the fields:</p>
+    <ul>
+        <li>program</li>
+        <li>activity_ordinal (optional)</li>
+        <li>scope</li>
+        <li>variable</li>
+        <li>value</li>
+    </ul>
+    <textarea ng-model="pdsToPut"></textarea>
+
+    <br>
+    <button ng-click="start()">Start putting pd</button>
+    <br><br>
+
+    <p>Successful writes:</p>
+    <pre>[[ successfulWrites | json : '  ' ]]</pre>
+
+    <p>Failed writes:</p>
+    <pre>[[ failedWrites | json : '  ' ]]</pre>
+</fieldset>
+
+<!-- <fieldset>
+    <legend>Generate PD</legend>
+    <p>
+        Generate a large set of pd entities. Does not attempt to create typical
+        data associations (i.e. generated pds will not be associated with any
+        existing users, classrooms, etc.).
+    </p>
+    <form id="generate_pd" onsubmit="return false;">
+        <label>
+            Number of pd entities:
+            <input type="number" id="generate_pd__num_entities">
+        </label>
+        <button>submit</button>
+    </form>
+    <script type="text/javascript">
+
+$('#generate_pd button').click(function () {
+    'use strict';
+    var numEntities = $('#generate_pd__num_entities').val();
+    $.ajax('/api/generate_test_pd', {
+        dataType: 'json',
+        data: {num_entities: numEntities},
+        success: function (response) {
+            $('#generate_pd').append('<span>Complete.</span.');
+        }
+    });
+});
+
+    </script>
+</fieldset> -->
+
+{% endblock %}

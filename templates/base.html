@@ -1,0 +1,378 @@
+{#
+
+Base template for all pegasus pages
+
+Inheriting templates may extend:
+
+title - the <title> tag
+css - all standard <link> tags are here, can override them by defining this block
+header - good for js and css stuff
+nav_menu - for adding things to the Home drop-down menu
+godbar - for developer tools
+content - this is where your page goes, obviously
+
+You can switch parts of the template on or off with these variables. If any of
+them are not defined, their corresponding section will be displayed. Set to
+False to turn off.
+
+show_nav_bar
+show_loading_mask
+show_footer
+
+#}<!Doctype html>
+
+<!-- Condition comments are only supported up to IE 9. -->
+<!--[if IE 6]>
+<html class="ie ie6" lang="en" ng-app="PertsApp" id="ng-app">
+<![endif]--><!--[if IE 7]>
+<html class="ie ie7" lang="en" ng-app="PertsApp" id="ng-app">
+<![endif]--><!--[if IE 8]>
+<html class="ie ie8" lang="en" ng-app="PertsApp" id="ng-app">
+<![endif]--><!--[if IE 9]>
+<html class="ie ie9" lang="en" ng-app="PertsApp" id="ng-app">
+<![endif]--><!--[if !IE]><!-->
+<html lang="en" ng-app="PertsApp" id="ng-app">
+<!--<![endif]-->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+        <title>
+            {% block title %}
+            Students' PATHS
+            {% endblock %}
+        </title>
+
+        {% block css %}
+        <!-- css block -->
+
+
+            {% if is_localhost %}
+
+                <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+                <!-- a select box plugin -->
+                <link rel="stylesheet" href="/static/css/chosen.css">
+                <link rel="stylesheet" href="/static/css/smartstart.css">
+                <link rel="stylesheet" href="/static/css/main.css">
+
+            {% else %}
+
+                <link rel="stylesheet" href="/static/css/dist/base.min.css">
+
+            {% endif %}
+
+                <link rel="stylesheet" href="/static/fonts/font-awesome/css/font-awesome.min.css">
+        <!-- end css block -->
+        {% endblock %}
+
+        <!--[if !IE]><!--><script>
+
+// Hack to target ie10 with CSS
+// http://www.impressivewebs.com/ie10-css-hacks/#comment-27811
+// http://msdn.microsoft.com/en-us/library/ie/8ka90k2e(v=vs.94).aspx
+if (/*@cc_on!@*/false && document.documentMode === 10) {
+    document.documentElement.className += ' ie ie10';
+}
+
+        </script><!--<![endif]-->
+
+        <script type="text/javascript">
+
+var normalUserType = '{{ normal_user.user_type if normal_user else '' }}' || undefined;
+var userType = '{{ user.user_type if user else '' }}' || undefined;
+var userId = '{{ user.id if user else '' }}' || undefined;
+var userEmail = '{{ user.email if user else '' }}' || undefined;
+
+        </script>
+
+        <!-- Sentry error logging, see app.getsentry.com -->
+        <script src="//cdn.ravenjs.com/1.1.15/jquery,native/raven.min.js">
+        </script>
+        <script>
+// Unique URL for Yosemite—different from pegasus.
+Raven.config('26831', {
+    // we highly recommend restricting exceptions to a domain in order to filter out clutter
+    whitelistUrls: ['studentspaths.org', 'www.studentspaths.org', 'yosemiteplatform.appspot.com']
+}).install();
+Raven.setUser({
+    userType: userType,
+    email: userEmail,
+    userId: userId
+});
+        </script>
+
+    {% block javascript %}
+
+    {% if is_localhost %}
+
+        <script src="/static/js/stacktrace.js"></script>
+        <script src="/static/js/modernizr-2.6.2-custom.min.js"></script>
+        <script src="/static/js/json2.js"></script>
+        <script src="/static/js/util.js"></script>
+        <!-- jQuery must precede angular for ng-includes in dashboard -->
+        <script src="/static/js/jquery-1.10.2.js"></script>
+        <!-- a select box plugin -->
+        <script src="/static/js/chosen.jquery.min.js"></script>
+        <!-- a textarea plugin -->
+        <script src="/static/js/jquery-autogrow_textarea.js"></script>
+        <!-- a input placeholder polyfill -->
+        <script src="/static/js/placeholder.js"></script>
+
+        <!-- BEFORE UPGRADING ANGULAR -->
+        <!-- CAM has hacked the file below to fix certain bugs. -->
+        <!-- Don't replace this file without demonstrating these bugs -->
+        <!-- won't return. -->
+        <script src="/static/js/angular-1.0.7.min.js"></script>
+        <script src="/static/js/angular-sanitize-1.0.7.min.js"></script>
+        <script src="/static/js/angular-ui-bootstrap-0.6.0.min.js"></script>
+        <script src="/static/js/bind_once.js"></script>
+        <!-- keyboard shortcut support -->
+        <script src="/static/js/mousetrap.min.js"></script>
+        <script src="/static/js/keyboardShortcuts.js"></script>
+        <script src="/static/js/base.js"></script>
+        <script src="/static/js/smartstart.js"></script>
+
+    {% else %}
+
+        <script src="/static/js/dist/base.min.js"></script>
+
+    {% endif %}
+
+    {% endblock %}
+
+
+
+        <!-- header block -->
+
+        {% block header %}
+        {% endblock %}
+
+        <!-- end header block -->
+
+    </head>
+    <body>
+
+    {% if show_nav_bar is not defined or show_nav_bar %}
+
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <header id="header" class="container clearfix">
+                <div class="row">
+                    <div class="one-third logo">
+                        <a href="/" id="logo">
+                            <img src="/static/images/studentspaths_logo.png" alt="Students' PATHS">
+                        </a>
+                    </div>
+                    <div class="one-third user_message_container">
+                        <div id="user_message" class="user_message" style="display:none;"></div>
+                    </div>
+                    <nav id="main-nav">
+                        <ul>
+                            {% if show_main_nav is not defined or show_main_nav %}
+                            <li class="main-level">
+
+                                {% if user %}
+                                <a href="{{config.user_home_page[user.user_type]}}"
+                                   data-description="">
+                                    Home
+                                    {% if user.user_type not in ['student', 'public'] %}
+                                    &nbsp;<i class="icon-chevron-down"></i>
+                                    {% endif %}
+                                </a>
+                                {% else %}
+                                <a href="#" data-description="">Home</a>
+                                {% endif %}
+
+                                {% if user %}
+                                <ul>
+                                    {% block nav_menu %}
+                                    {% if google_admin %}
+                                        <li><a href="/god">Play god</a></li>
+                                        <li><a href="/test">Testing</a></li>
+                                    {% endif %}
+
+                                    {% if user.user_type in ['god','researcher','school_admin'] %}
+                                        <li><a href="/d">Dashboard</a></li>
+                                        <!-- No need for the teacher panel in Yosemite -->
+                                        <!-- <li><a href="{{config.user_home_page['teacher']}}">Teacher Panel</a></li> -->
+                                    {% endif %}
+
+                                    {% if user.user_type in ['god','researcher'] %}
+                                        <li><a href="/impersonate">Impersonate</a></li>
+                                    {% endif %}
+
+                                    {% if user.user_type not in ['student','public'] %}
+                                        <li><a href="/documents">
+                                            Documents
+                                        </a></li>
+                                        <li><a href="/account">
+                                            My account
+                                        </a></li>
+                                    {% endif %}
+
+                                    {% endblock %}
+                                </ul>
+                                {% endif %}
+                            </li>
+                            {% endif %}
+                            <li class="main-level">
+                                <a href="/beta"
+                                   data-description="">Help</a>
+                            </li>
+                            <li class="main-level">
+                                {% if user and user.user_type != 'public' %}
+                                    <a href="/logout" data-description="">Log Out</a><br>
+                                {% else %}
+                                    <a href="/login" data-description="">Log In</a><br>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+
+            </header>
+        </div>
+
+
+        <div class="navbar navbar-inverse navbar-fixed-top admin-control">
+            {% if user %}
+                {% if user.user_type == 'god' or normal_user.user_type == 'god' %}
+                    <header id="godbar" class="container clearfix">
+
+                        <!--
+                        Search Bar
+                        HACK ALERT - Notice random argument hack forces reload
+                        when searching on the entity page.  Otherwhise it
+                        breaks as you can see if you remove it and try to
+                        conduct a search using this form on the results page.
+                        If someone can get rid of this hack, much obliged
+                        -->
+                        <div class="align-left">
+                            <form action="
+                                javascript:
+                                    window.location.href =
+                                        '/entity' +
+                                        '?seed=' + Math.floor((Math.random()*10000)+1) +
+                                        '#' + $('#search').val();
+                                ">
+                                <input id='search' placeholder="search" autocomplete="off">
+                            </form>
+                        </div>
+
+                        <!-- godbar -->
+
+                        {% if user %}
+                            {% if user.user_type == 'god' or normal_user.user_type == 'god' %}
+                                {% block godbar %}
+                                {% endblock %}
+                            {% endif %}
+                        {% endif %}
+
+                        <!-- end godbar -->
+
+                        {% if user %}
+                        <div class="align-right">
+                            PERTS: {{ user.first_name }} ({{ user.user_type }})
+                            <br>
+
+                            Google:
+
+                            {% if connected_to_google %}
+                                {{ google_user.email() }}
+                                {% if google_admin %}
+                                    (admin)
+                                {% endif %}
+                            {% else %}
+                                not connected
+                            {% endif %}
+                            <br>
+
+                            {% if currently_impersonating %}
+                                <a href="/impersonate?page_action=stop_impersonating">
+                                    stop impersonating
+                                </a>
+                            <br>
+                            {% endif %}
+                                <a href="https://docs.google.com/document/d/1nToiqzsKvffWF2Vxi5y_gFeUqhdwnXbLl8e8wH_7gqs/edit" target="_blank">
+                                    docs
+                                </a>
+                            <br>
+                        </div>
+                        {% endif %}
+                    </header>
+                {% endif %}
+            {% endif %}
+        </div>
+
+    {% endif %}
+
+    {% if show_loading_mask is not defined or show_loading_mask %}
+
+        <!-- ng cloak prevents screen flicker from unloaded/uncompiled stuff -->
+        <!-- http://docs.angularjs.org/api/ng.directive:ngCloak -->
+        <section id="loading" cloak-mask>
+            Loading
+            <p class="notice old_browser_only">
+                Internet Explorer 6 and 7 are known to be very slow. Please be
+                patient or use another browser.
+            </p>
+        </section>
+
+    {% endif %}
+
+
+        <section id="content" class="container clearfix ng-cloak" ng-cloak>
+
+            <!-- content block -->
+
+            {% block content %}
+            {% endblock %}
+
+            <!-- end content block -->
+
+        </section>
+
+    {% if show_footer is not defined or show_footer %}
+
+        <footer id="sticky_footer" class="no-print">
+
+            <footer id="footer" class="clearfix">
+
+                <div class="container">
+
+                    <div class="three-fourth">
+
+                        <div class="ss-contact-info">
+                            <!--
+                            <ul class="contact-info">
+                                <li>
+                                    <i class="icon-phone"></i>
+                                    1-844-225-6089
+                                </li>
+                                <li>
+                                    <i class="icon-print"></i>
+                                    1-877-358-5617
+                                </li>
+                                <li>
+                                    <i class="icon-envelope"></i>
+                                    <a href="</a>
+                                </li>
+                            </ul>
+                            -->
+                            <!-- end .contact-info -->
+                        </div>
+
+                    </div><!-- end .three-fourth -->
+
+                </div><!-- end .container -->
+
+            </footer><!-- end #footer -->
+
+        </footer><!-- end #sticky_footer -->
+
+    {% endif %}
+
+    {# Commented out until this things stops giving me a hard time. #}
+    {# {{ gae_mini_profiler_includes() | safe}} #}
+
+    </body>
+</html>

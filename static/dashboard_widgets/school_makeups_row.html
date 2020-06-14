@@ -1,0 +1,53 @@
+<tr bindonce ng-repeat="session in sessions"
+    ng-show="session.activity_ordinal == makeupSession"
+    bo-class="{uploaded_by_admin: user.uploaded_by_admin}"
+    ng-class="{warning:!user.certified && classroom.roster_complete && !hasMWN}">
+
+    <td class="select">
+        <input type="checkbox" ng-model="$parent.isSelected">
+    </td>
+    <td class="classroom">
+        <a bo-href="'#/classroom/' + user.assc_classroom_list[0] + '/classroom_roster'"
+           bo-text="user.classroom_name">
+    </td>
+    <td class="first_name">
+        <input type="text" ng-model="user.first_name">
+        <!-- Use the keyboard shortcut "p p i", defined in
+             keyboardShortcuts.js, to show this. -->
+        <span class="id-display" style="display: none" bo-text="user.id">
+        </span>
+    </td>
+    <td class="last_name">
+        <input type="text" ng-model="user.last_name">
+    </td>
+    <td class="student_id">
+        <input type="text" ng-model="user.student_id"
+               bo-disabled="user.uploaded_by_admin">
+    </td>
+    <td class="session_progress">
+        <span bo-text="session.activity_ordinal"></span>:
+        <span bo-text="user.progressLabel(session.activity_ordinal)"></span>
+    </td>
+    <td class="status_code">
+<!--         <div class="styled-select" swappable-status-select
+             activity-ordinal="session.activity_ordinal">
+            <span bo-text="getCodeLabel(session.activity_ordinal)"
+                  class="fake-select"></span>
+            <i></i>
+        </div>
+ -->
+        <select styled-select
+                ng-model="user['s' + session.activity_ordinal + '_status_code']"
+                ng-options="o.id as o.label group by o.group for o in statusCodes | orderBy:['group', 'label']">
+        </select>
+        <span ng-show="user['s' + session.activity_ordinal + '_status_code'] == 'MWN' && !user['s' + session.activity_ordinal + '_merge_id']"
+              ng-click="openDialog(session.activity_ordinal)" class="pseudolink">
+            <i class="icon-warning-sign"></i>Specify with whom to merge
+        </span>
+        <span ng-show="user['s' + session.activity_ordinal + '_merge_id']"
+              ng-click="openDialog(session.activity_ordinal)" class="pseudolink">
+            [[ mergeTargets[session.activity_ordinal].first_name ]] [[ mergeTargets[session.activity_ordinal].last_name ]]
+        </span>
+    </td>
+</tr>
+

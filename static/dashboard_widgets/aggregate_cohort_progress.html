@@ -1,0 +1,47 @@
+<!-- This widget is used for both the cohort_progress page and the
+program_progress page. In the cohort_proress page, the widget is given a list
+of only one cohort. In the program_progress page, it is given many. -->
+<td ng-show="showCohortColumn=='true'" class="name col0">
+    <a href="#/cohort/[[ cohortList[0].id ]]/classroom_progress">
+        [[ cohortList[0].name ]]
+    </a>
+</td>
+<td class="session col1">
+    <span bo-text="row.activityOrdinal"></span>
+</td>
+
+<td class="unscheduled col2">
+    <span bo-text="row.unscheduled()"></span>
+</td>
+<td class="behind col3">
+    <span bo-text="row.behind()"></span>
+</td>
+<td class="scheduled_completed col4">
+    <span bo-text="row.scheduledCompleted()"></span>
+</td>
+<td class="total col5">
+    <span bo-text="row.totalClassrooms()"></span>
+</td>
+
+<td class="incomplete_rosters col6">
+    <span bo-text="row.incompleteRosters()"></span>
+</td>
+<td class="uncertified col7">
+    <span bo-text="row.uncertified()"></span>
+</td>
+
+<td class="study_eligible col8">
+    <span bo-text="row.studyEligible()"></span>
+</td>
+<td class="completed col9">
+    <span bo-text="row.complete() + ' (' + row.pctComplete() + ')'"></span>
+</td>
+<td class="makeup_ineligible col10">
+    <span bo-text="row.makeupIneligible()"></span>
+</td>
+<td class="makeup_eligible col11">
+    <span bo-text="row.makeupEligible()"></span>
+</td>
+<td class="uncoded col12">
+    <span bo-text="row.uncoded()"></span>
+</td>

@@ -1,0 +1,23 @@
+<table class="dashboard-table">
+    <thead>
+        <tr>
+            <th colspan="4" class="table-title">
+                Makeups for Session [[ makeupSession ]]
+            </th>
+        </tr>
+        <tr>
+            <th>Classroom</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Student ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr bindonce ng-repeat="student in searchList">
+            <td bo-text="student.classroom_name"></td>
+            <td bo-text="student.first_name"></td>
+            <td bo-text="student.last_name"></td>
+            <td bo-text="student.student_id"></td>
+        </tr>
+    </tbody>
+</table>

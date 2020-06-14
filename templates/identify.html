@@ -1,0 +1,192 @@
+{# Student sign-in. #}
+
+{% extends "base.html" %}
+
+{% block title %}
+Participant Sign In
+{% endblock %}
+
+{% block css %}
+
+<!-- qualtrics-based stylesheet -->
+<link rel="stylesheet" href="/static/css/students.css">
+
+<!-- don't use any of the normal css stylesheets -->
+
+{% endblock %}
+
+{% block header %}
+
+<script src="/static/js/identify.js"></script>
+
+<!-- Custom fonts -->
+<script type="text/javascript" src="//use.typekit.net/qnb2yzi.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div ng-controller="IdentifyController" class="full-container students-paths">
+
+    <div id="header"></div>
+
+    <div class="outer-container">
+        <div class="inner-container">
+            <!-- Default Sign-In Form -->
+            <div ng-show="phase <= 1">
+
+                <h1>Student sign-in</h1>
+
+                <div ng-show="alert" ng-class="alert.type" ng-bind-html-unsafe="alert.msg" class="instruction-text"></div>
+                <div class="notice old_browser_only instruction-text">
+                    You are using an outdated browser and may experience very long load
+                    times. Please use a different browser if possible.
+                </div>
+
+                <form name="identifyForm" onsubmit="return false"
+                      autocomplete="off" novalidate>
+                    <div ng-show="phase == 0">
+                        Enter your participation code:&nbsp;<br>
+                        <!-- cam: I found that one of the directives used here previously,
+                        to-lower-case, was not compatible with ng-pattern. -->
+                        <input type="text" ng-model="code" name="code"
+                               ng-pattern="codeRegex" required>
+                        <button ng-hide='cohort'
+                                ng-click="getCohort(code)"
+                                ng-disabled="identifyForm.code.$invalid">Go</button>
+                        <img src="/static/images/better_loading.gif"
+                             class="cohort-loading" ng-show="cohortLoading">
+                    </div>
+                <!-- Angular doesn't play well with browsers who pre-fill forms when using
+                     autocompleted fields; we're putting 'autocomplete="off"' to avoid
+                     issues that arise when autocomplete fills out a form. [1]
+                     [1]: https://github.com/angular/angular.js/issues/1460 -->
+                    <div ng-show='cohort'>
+                        <label>
+                            Class:<br>
+                            <select ng-model="identifyData.classroom" name="classroom"
+                                    ng-options="c.id as c.name for c in classroomList | orderBy:'name'"
+                                    ng-blur="classroomBlurred = true"
+                                    styled-select required>
+                            </select>
+                            <i class="icon-warning-sign" ng-show="classroomBlurred && identifyForm.classroom.$invalid">
+                                required
+                            </i>
+                        </label>
+                        <label>
+                            Nickname <small>(optional)</small>
+                        </label>
+                        <input ng-model="ignored" type="text">
+                        <label>
+                            Full first name
+                        </label>
+                        <input ng-model="identifyData.first_name" type="text"
+                               name="first_name" required
+                               ng-blur="firstNameBlurred = true">
+                        <i class="icon-warning-sign" ng-show="firstNameBlurred && identifyForm.first_name.$invalid">
+                            required
+                        </i>
+                        <label>
+                            Last name
+                        </label>
+                        <input ng-model="identifyData.last_name" type="text"
+                               name="last_name" required
+                               ng-blur="lastNameBlurred = true">
+                        <i class="icon-warning-sign" ng-show="lastNameBlurred && identifyForm.last_name.$invalid">
+                            required
+                        </i>
+                        <button class="block-button"
+                                ng-click="identify()"
+                                ng-disabled="identifyForm.$invalid || identifyButtonClicked">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Phase 2 - Display Partial Matches -->
+            <div ng-show="phase == 2">
+                <h3>Are you any of these people?</h3>
+                <form name="partialMatchForm" onsubmit="return false"
+                      novalidate>
+                    <form class="partial-matches" novalidate>
+                        <div class="partial-match" ng-repeat="m in partialMatches">
+                            <input type="radio" ng-value="m.id" name="$parent.partialMatchChoice"
+                                   id="[[ 'radio_' + $index ]]"
+                                   ng-model="$parent.partialMatchChoice" required>
+                            <label for="[[ 'radio_' + $index ]]" class="radio-label">
+                                <span ng-hide="$last">
+                                    [[ m.first_name ]]&nbsp;[[ m.last_name ]] in the class [[ m.classroom_name ]]
+                                </span>
+                                <span ng-show="$last">
+                                    [[ m.first_name ]]
+                                </span>
+                            </label>
+                        </div>
+                    </form>
+                    <!-- <ul id="partial_matches_ul">
+                        <li ng-repeat="m in partialMatches">
+                            <input type="radio" ng-value="m.id" name="$parent.partialMatchChoice"
+                                   ng-model="$parent.partialMatchChoice" required>
+                            [[ m.first_name]]&nbsp;[[ m.last_name ]]
+                        </li>
+                    </ul> -->
+                    <button ng-click="choosePartialMatch()"
+                            ng-disabled="partialMatchForm.$invalid">
+                            Submit
+                    </button>
+                    <!-- why is there a pointless-looking element here? -->
+                    <!-- http://stackoverflow.com/questions/15778739/angularjs-required-radio-buttons-needs-two-click-events-to-be-valid -->
+                    <span style="display:none">[[partialMatchChoice]]</span>
+                </form>
+            </div>
+
+            <!-- New User Double Check Form -->
+            <div ng-show="phase == 3">
+                <p><b>It looks like you're a new user. Welcome!</b></p>
+                <div class="instruction-text">Double check your name and click "Create New User" to start.</div>
+                <form name="confirmNewUserForm" novalidate>
+                    <label>
+                        Nickname <small>(optional)</small><br>
+                        <input ng-model="ignored" type="text">
+                    </label>
+                    <label>
+                        Full first name<br>
+                        <input ng-model="identifyData.first_name" type="text"
+                               name="first_name" required
+                               ng-blur="confirmFirstNameBlurred = true">
+                        <i class="icon-warning-sign" ng-show="confirmFirstNameBlurred && confirmNewUserForm.first_name.$invalid">
+                            required
+                        </i>
+                    </label>
+                    <label>
+                        Last name<br>
+                        <input ng-model="identifyData.last_name" type="text"
+                               name="last_name" required
+                               ng-blur="confirmLastNameBlurred = true">
+                        <i class="icon-warning-sign" ng-show="confirmLastNameBlurred && confirmNewUserForm.last_name.$invalid">
+                            required
+                        </i>
+                    </label>
+                    <button ng-click="confirmNewUser()" ng-disabled="confirmNewUserForm.$invalid || confirmNewUserButtonClicked">
+                        Create New User
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <div id="footer">
+        <div class="foot-text">&copy; 2017 Stanford University. All Rights Reserved.</div>
+    </div>
+
+<!--
+<pre>[[ classroomList | json:'  ' ]]</pre>
+<pre>[[ cohort | json:'  ' ]]</pre>
+<pre>[[ identifyData | json:'  ' ]]</pre>
+ -->
+
+</div> <!-- IdentifyController -->
+
+{% endblock %}

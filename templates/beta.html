@@ -1,0 +1,113 @@
+{# A little message to let users know pegasus is still in development. #}
+
+{% extends "base.html" %}
+
+{% block title %}
+Beta Help
+{% endblock %}
+
+{% block header %}
+
+<script src="/static/js/client_test.js"></script>
+<script type="text/javascript">
+
+{# For the cross site qualtrics test. #}
+var programId = '{{ program_id }}';
+
+</script>
+
+<style>
+
+#test_button {
+    margin-top: 20px;
+}
+
+#client_test_busy {
+    vertical-align: bottom;
+    margin: 0;
+    position: relative;
+    top: 13px;
+}
+
+table {
+    width: initial;
+}
+
+table.colorless tr {
+    background-color: transparent;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<!--
+<div class="row">
+    <div id="client_test_div" class="span7">
+        <h1>Thank you for participating!</h1>
+        <p>To ask questions or report a bug, you can contact us:</p>
+        <table class="colorless">
+            <tbody>
+                <tr>
+                    <td>Phone:</td><td><b>1-844-225-6089</b></td>
+                </tr>
+                <tr>
+                    <td>Fax:</td><td><b>1-877-358-5617</b></td>
+                </tr>
+                <tr>
+                    <</b></td>
+                </tr>
+            </tbody>
+        </table>
+        <p>
+            Lets us know what email address you use to sign in, what browser
+            you are using, and, if applicable, screenshots of the confusing
+            behavior. We really appreciate your help.
+        </p>
+        <p>
+            Thanks!<br>
+            The Students' PATHS Researchers
+        </p>
+    </div>
+</div>
+<br><br><br>
+-->
+
+<div class="row">
+    <div class="span7" ng-controller="ClientTestController" ng-show="showClientTests">
+        <h1>Test your device</h1>
+        <p>
+            To find out if our technology will work with your device and
+            internet connection, please click the button below.
+        </p>
+        <p>
+            Be sure to put headphones on first, because the test plays sound.
+        </p>
+        <button id="test_button" ng-click="runClientTests()"
+                ng-disabled="testRun">
+            Run test
+        </button>
+        <img id="client_test_busy" src="/static/images/loading.gif"
+             ng-show="testRunning">
+        <div id="client_test_div" style="margin-top: 30px"></div>
+        <br><br>
+        <div class="alert alert-success" ng-show="allTestsSuccessful == true">
+            Everything works great!
+        </div>
+        <div class="alert alert-danger" ng-show="allTestsSuccessful == false">
+            <p>
+                We found some problems. Please email the following to
+                :
+            </p>
+            <ul>
+                <li ng-repeat="testMessage in failedTests">
+                    [[ testMessage ]]
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

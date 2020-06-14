@@ -1,0 +1,173 @@
+    <style>
+    #add_classroom label {
+        margin-right: 20px;
+    }
+</style>
+
+<div class="row" ng-show="displayMoveError">
+    <div class="span3"></div>
+    <div class="span6 user_message error">
+        There was a problem moving these classrooms.
+        <br><br>
+        Please contact us to resolve it: 
+    </div>
+    <div class="span3"></div>
+</div>
+
+<div class="row" ng-show="showAddForm">
+    <div id="add_classroom" class="span12">
+        <fieldset>
+            <i class="pull-right icon-remove close-button"
+               ng-click="showAddForm = false"></i>
+            <form name="addClassroomForm">
+                <div class="row">
+                    <div class="span10">
+                        <label class="pull-left">
+                            Teacher first name*
+                            <br>
+                            <input type="text" placeholder="first name" required
+                                   ng-class="{blurred: firstNameBlurred}"
+                                   ng-blur="firstNameBlurred = true"
+                                   ng-model="classroomParams.teacher_first_name">
+                        </label>
+                        <label class="pull-left">
+                            Teacher last name*
+                            <br>
+                            <input type="text" placeholder="last name" required
+                                   ng-class="{blurred: lastNameBlurred}"
+                                   ng-blur="lastNameBlurred = true"
+                                   ng-model="classroomParams.teacher_last_name">
+                        </label>
+                        <label class="pull-left">
+                            Teacher email
+                            <br>
+                            <input type="email" placeholder="email"
+                                   ng-class="{blurred: teacherEmailBlurred}"
+                                   ng-model="classroomParams.teacher_email"
+                                   ng-blur="teacherEmailBlurred = true">
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span10">
+                        <label class="pull-left">
+                            Class Name*
+                            <br>
+                            <input type="text" placeholder="class name" required
+                                   ng-class="{blurred: classNameBlurred}"
+                                   ng-blur="classNameBlurred = true"
+                                   ng-model="classroomParams.name">
+                        </label>
+                        <label class="pull-left">
+                            Period/Section
+                            <br>
+                            <input type="text" placeholder="period or section"
+                                   ng-model="classroomParams.name_extra">
+                        </label>
+                        <label class="pull-left">
+                            Unique Section ID*
+                            <br>
+                            <input type="text" placeholder="course ID" required
+                                   ng-class="{blurred: courseIdBlurred}"
+                                   ng-blur="courseIdBlurred = true"
+                                   ng-model="classroomParams.course_id">
+                        </label>
+                    </div>
+                </div>
+                <label>
+                    Class will be displayed as:
+                    <p><strong>[[ constructNewClassroomName() ]]</strong></p>
+                </label>
+                <button ng-click="addClassroom(classroomParams)"
+                        ng-disabled="addClassroomForm.$invalid">Add</button>
+            </form>
+        </fieldset>
+    </div>
+</div>
+
+<div class="row dashboard-table-controls">
+    <div class="span12">
+        <input type="text" ng-model="searchText" placeholder="Search...">
+        <select chosen-select
+                data-placeholder="Move classrooms(s) to..."
+                select-options="availableCohorts"
+                ng-options="c as c.name for c in availableCohorts"
+                ng-model="moveToCohort"
+                ng-disabled="selectedList.length == 0 || availableCohorts.length == 0">
+            <!-- Empty option tag works around bug in chosen plugin. -->
+            <!-- http://stackoverflow.com/questions/19369250/uncaught-typeerror-cannot-set-property-selected-of-undefined -->
+            <option value=""></option>
+        </select>
+        <button class="icon-envelope icon_button" type="button"
+                ng-click="openDialog()" tooltip="Get teacher email addresses"
+                ng-disabled="selectedList.length == 0"></button>
+        <button ng-disabled="selectedList.length == 0"
+                class="icon_button icon-trash" tooltip="Delete classrooms"
+                ng-click="confirmDeleteClassrooms()"></button>
+        <button class="icon_button icon-exchange" tooltip="Toggle notes view"
+                ng-click="toggleRightMode()"></button>
+        <a href="/documents" target="_blank"
+                tooltip="Printable documents for running a study session"
+                class="icon-file icon_button button"></a>
+        <button ng-click="showAddForm = true" ng-disabled="showAddForm"
+                class="pull-right">
+            <i class="icon-plus"></i>&nbsp;&nbsp;Add Class
+        </button>
+    </div>
+    <div class="span12" ng-show="showMoveProgressMonitor">
+        Moved [[ numMovedStudents ]] of [[ totalMovedStudents ]] students.
+        Moved [[ numMovedClassrooms ]] of [[ totalMovedClassrooms ]] classes.
+    </div>
+</div>
+
+<table class="dashboard-table">
+    <colgroup>
+        <col ng-repeat="col in columns" class="[[col.colClass]]" span="1">
+    </colgroup>
+    <thead>
+        <!-- This first row is essentially categories of columns. The colX
+        classes allow us to apply borders only on certain columns. -->
+        <tr>
+            <th colspan="6" class="col0 col1 col2 col3 col4 col5"><!-- blank --></th>
+            <th colspan="2" class="col6 col7"
+                ng-show="rightMode == 'stats'"></th>
+            <th colspan="5" class="col8 col9 col10 col11 col12"
+                ng-show="rightMode == 'stats'">
+                Certified Study Eligible Students
+            </th>
+            <th class="col13 col14" colspan="7" ng-show="rightMode == 'notes'">
+                <!-- to maintain a consistent content height -->
+                &nbsp;
+            </th>
+        </tr>
+        <tr ng-class="{'reverse-sort': reverseSort}">
+            <th bindonce ng-repeat="col in columns" ng-click="sortBy($index)"
+                class="[['col' + $index]]" ng-hide="$index >= 6 && rightMode == 'notes'"
+                ng-class="{sortable: col.sortable, 'sorting-active': sortedColumn == $index}">
+                <span tooltip="[[ col.tooltip ]]" >[[ col.name ]]</span>
+                <div bo-if="col.colClass == 'select'">
+                    <input type="checkbox"
+                           ng-model="allSelected"
+                           ng-change="toggleSelectAll(allSelected)">
+                </div>
+            </th>
+            <th class="col13 sortable" ng-show="rightMode == 'notes'"
+                ng-class="{'sorting-active': sortedColumn == 6}"
+                ng-click="sortBy(6)">Total</th>
+            <th class="col14" ng-show="rightMode == 'notes'"
+                colspan="6">Location / Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr bindonce="activity" ng-repeat="activity in pageList"
+            activity-progress right-mode="rightMode"
+            show-progress="true" activity-id="[[ activity.id ]]">
+        </tr>
+    </tbody>
+</table>
+
+<div class="empty-table-hint" ng-show="searchList.length == 0">
+    [[ emptyTableMessage ]]
+</div>
+
+<div table-page-nav></div>

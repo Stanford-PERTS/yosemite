@@ -1,0 +1,37 @@
+{# The many pages of the dashboard are just small html templates loaded #}
+{# dynamically into the ng-view directive below. See the two dashboard #}
+{# folders inside the templates folder. #}
+
+{% extends "base.html" %}
+
+{% block javascript %}
+    {% if is_localhost %}
+        {# calling super() includes the base.html javascripts #}
+        {{ super() }}
+        <script src="/static/js/datepickr.js"></script>
+        <script src="/static/js/paginated_table_controller.js"></script>
+        <script src="/static/js/table_row_controller.js"></script>
+        <script src="/static/js/dashboard.js"></script>
+    {% else %}
+        {# NOT calling super() uses only the dashboard layer, which #}
+        {# INCLUDES the base.html javascripts. #}
+        <script src="/static/js/dist/dashboard.min.js"></script>
+    {% endif %}
+{% endblock %}
+
+{% block header %}
+
+<link rel="stylesheet" href="/static/css/dashboard.css">
+
+<script type="text/javascript">
+    var user = {{ user.to_dict()|tojson|safe }};
+    var statusCodes = {{ config.status_codes|tojson|safe }};
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div ng-view></div>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+# Task queue defintions. How fast to run tasks and on what hardware.
+
+queue:
+
+# The queue with settings for systematic updates, i.e. scrolling through all
+# entities of a kind and modifying them. The updates themselves are map reduce
+# jobs, defined in map.py.
+- name: systematic-update
+  rate: 10/s
+  bucket_size: 10             # set to your number of instances 
+  # This property should allow us to specify that map reduce jobs happen on
+  # burly hardware. These used to be called "backend instances" now just
+  # "modules" burly settings. The things that most web requests are handled by
+  # are "frontend instances".
+  target: work   # the name of the module to handle the job

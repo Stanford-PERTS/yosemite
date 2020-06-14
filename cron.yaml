@@ -1,0 +1,99 @@
+cron:
+# # We will likely never turn this back on.
+# - description: update search index
+#   url: /cron/index
+#   schedule: every 1 minutes
+# Turn off when not collecting data because it costs money.
+- description: aggregate user data by activity and cohort
+  url: /cron/aggregate
+  schedule: every 2 minutes
+- description: cache cohort rosters to make roster views speedy
+  url: /map/cache_contents/cohort
+  schedule: every 15 minutes
+- description: cache classroom rosters to make roster views speedy
+  url: /map/cache_contents/classroom
+  schedule: every 15 minutes
+# Cheap cronjobs that are harmless to leave running.
+- description: check for errors and email us
+  url: /cron/check_for_errors
+  schedule: every 1 minutes
+- description: send any emails that are due according to the queue
+  url: /cron/send_pending_email
+  schedule: every 1 minutes
+- description: check for and send reminders
+  url: /cron/send_reminders
+  schedule: every 1 hours
+# Constructing Backup URLs: (using gcs daily backup 1 for example)
+# name = backup-bulk-daily-1
+# kind = Activity, Aggregator, Classroom, Cohort, CsvCache, Email,
+#        Error Checker, Indexer, LogEntry, Program, Reminder, ResetPasswordToken,
+#        School, Stratifier, StratifierHistory, User, QualtricsLink
+# queue = (Optional, not used here. If left out, backup runs on "default" queue.)
+# filesystem = gs (for Google Cloud Storage)
+# gs_bucket_name = yosemite-backup-daily-1
+# namespace = (Optional. When specified, only entities from namespace are backed up.)
+#
+# Scheduled Backups with Cron documentation:
+# developers.google.com/appengine/articles/scheduled_backups
+#
+# Daily 1 set
+- description: gcs daily backup 1
+  url: /cron/backup?bucket=yosemite-backup-daily-1&kind=Activity&kind=Aggregator&kind=Classroom&kind=Cohort&kind=Email&kind=ErrorChecker&kind=GeneralCounterShard&kind=GeneralCounterShardConfig&kind=Program&kind=QualtricsLink&kind=Reminder&kind=School&kind=User
+  schedule: every mon,wed,fri,sun 09:00
+- description: pd daily backup 1
+  url: /cron/backup?bucket=yosemite-backup-daily-1&kind=Pd
+  schedule: every mon,wed,fri,sun 09:00
+- description: clean out yosemite-backup-daily-1
+  url: /cron/clean_gcs_bucket/yosemite-backup-daily-1
+  schedule: every mon,wed,fri,sun 08:45
+# Daily 2 set
+- description: gcs daily backup 2
+  url: /cron/backup?bucket=yosemite-backup-daily-2&kind=Activity&kind=Aggregator&kind=Classroom&kind=Cohort&kind=Email&kind=ErrorChecker&kind=GeneralCounterShard&kind=GeneralCounterShardConfig&kind=Program&kind=QualtricsLink&kind=Reminder&kind=School&kind=User
+  schedule: every tue,thu,sat 09:00
+- description: pd daily backup 2
+  url: /cron/backup?bucket=yosemite-backup-daily-2&kind=Pd
+  schedule: every tue,thu,sat 09:00
+- description: clean out yosemite-backup-daily-2
+  url: /cron/clean_gcs_bucket/yosemite-backup-daily-2
+  schedule: every tue,thu,sat 08:45
+# Weekly 1 set
+- description: gcs weekly backup 1
+  url: /cron/backup?bucket=yosemite-backup-weekly-1&kind=Activity&kind=Aggregator&kind=Classroom&kind=Cohort&kind=Email&kind=ErrorChecker&kind=GeneralCounterShard&kind=GeneralCounterShardConfig&kind=Program&kind=QualtricsLink&kind=Reminder&kind=School&kind=User
+  schedule: 1,15 of month 09:00
+- description: pd weekly backup 1
+  url: /cron/backup?bucket=yosemite-backup-weekly-1&kind=Pd
+  schedule: 1,15 of month 09:00
+- description: clean out yosemite-backup-weekly-1
+  url: /cron/clean_gcs_bucket/yosemite-backup-weekly-1
+  schedule: 1,15 of month 08:45
+# Weekly 2 set
+- description: gcs weekly backup 2
+  url: /cron/backup?bucket=yosemite-backup-weekly-2&kind=Activity&kind=Aggregator&kind=Classroom&kind=Cohort&kind=Email&kind=ErrorChecker&kind=GeneralCounterShard&kind=GeneralCounterShardConfig&kind=Program&kind=QualtricsLink&kind=Reminder&kind=School&kind=User
+  schedule: 8,22 of month 09:00
+- description: pd weekly backup 2
+  url: /cron/backup?bucket=yosemite-backup-weekly-2&kind=Pd
+  schedule: 8,22 of month 09:00
+- description: clean out yosemite-backup-weekly-2
+  url: /cron/clean_gcs_bucket/yosemite-backup-weekly-2
+  schedule: 8,22 of month 08:45
+# Monthly 1 set
+- description: gcs monthly backup 1
+  url: /cron/backup?bucket=yosemite-backup-monthly-1&kind=Activity&kind=Aggregator&kind=Classroom&kind=Cohort&kind=Email&kind=ErrorChecker&kind=GeneralCounterShard&kind=GeneralCounterShardConfig&kind=Program&kind=QualtricsLink&kind=Reminder&kind=School&kind=User
+  schedule: 1 of jan,mar,may,jul,sep,nov 09:00
+- description: pd monthly backup 1
+  url: /cron/backup?bucket=yosemite-backup-monthly-1&kind=Pd
+  schedule: 1 of jan,mar,may,jul,sep,nov 09:00
+- description: clean out yosemite-backup-monthly-1
+  url: /cron/clean_gcs_bucket/yosemite-backup-monthly-1
+  schedule: 1 of jan,mar,may,jul,sep,nov 08:45
+# Monthly 2 set
+- description: gcs monthly backup 2
+  url: /cron/backup?bucket=yosemite-backup-monthly-2&kind=Activity&kind=Aggregator&kind=Classroom&kind=Cohort&kind=Email&kind=ErrorChecker&kind=GeneralCounterShard&kind=GeneralCounterShardConfig&kind=Program&kind=QualtricsLink&kind=Reminder&kind=School&kind=User
+  schedule: 1 of feb,apr,jun,aug,oct,dec 09:00
+- description: pd monthly backup 2
+  url: /cron/backup?bucket=yosemite-backup-monthly-2&kind=Pd
+  schedule: 1 of feb,apr,jun,aug,oct,dec 09:00
+- description: clean out yosemite-backup-monthly-2
+  url: /cron/clean_gcs_bucket/yosemite-backup-monthly-2
+  schedule: 1 of feb,apr,jun,aug,oct,dec 08:45
+

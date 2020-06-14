@@ -1,0 +1,13 @@
+<h3>Add a class</h3>
+<form name="addClassroom" onsubmit="return false">
+    <label for="addClassroom_name">Name</label>
+    <input type="text" ng-model="classroomData.name" required>
+    <span ng-show="includeTeacherName">([[ teacher.last_name ]])</span>
+    <label for="addClassroom_cohort" ng-hide="isDisabled()">Cohort</label>
+    <select styled-select required ng-model="classroomData.cohort"
+            ng-hide="isDisabled()" ng-disabled="isDisabled()"
+            ng-options="c.id as c.name for c in cohortList"></select>
+    <button ng-disabled="addClassroom.$invalid" ng-click="submit()">Add</button>
+    <br>
+    <input type="checkbox" ng-model="includeTeacherName">Include my name
+</form>

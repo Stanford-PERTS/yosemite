@@ -1,0 +1,817 @@
+/* main.css                                                                  */
+/*                                                                           */
+/* A limited set of styles that apply to all pegasus platform pages.         */
+
+/* Colors!! */
+/* Please COPY AND PASTE your color when you need it, including comment. */
+
+.extremely-light-gray {
+    color: #f6f6f6; /* extremely-light-gray */
+}
+
+.very-light-gray {
+    color: #ddd; /* very-light-gray */
+}
+
+.light-gray {
+    color: #ccc; /* light-gray */
+}
+
+.gray {
+    color: #777; /* gray */
+}
+
+.dark-gray {
+    color: #333; /* dark-gray */
+}
+
+.very-dark-gray {
+    color: #222; /* very-dark-gray */
+}
+
+.orange {
+    color: #f15a23; /* orange */
+}
+
+.perts-light-blue {
+    color: #02AFF0; /* perts-light-blue */
+}
+
+.perts-medium-blue {
+    color: #3C77E0; /* perts-medium-blue */
+}
+
+.perts-dark-blue {
+    color: #015597; /* perts-dark-blue */
+}
+
+.perts-pale-red {
+    background-color: rgb(240, 193, 193); /* perts-pale-red (for ie) */
+    background-color: rgba(224, 130, 130, 0.5); /* perts-pale-red */
+}
+
+.clickable_cursor {
+    cursor: pointer;
+}
+
+.close-button {
+    cursor: pointer;
+}
+
+.translucent {
+    opacity: 0.25;
+    filter: alpha(opacity=25); /* For IE8 and earlier */
+}
+
+#loading {
+    background-color: white;
+    width: 100%;
+    height: 500px;
+    text-align: center;
+    padding-top: 200px;
+    font-size: 3em;
+    color: gray;
+}
+
+.ie6 #loading {
+    /* the loading screen just doesn't work on ie6 */
+    display: none;
+}
+
+#loading p.notice {
+    font-size: 16px;
+    width: 60%;
+}
+
+.old_browser_only { display: none; }
+.ie6 .old_browser_only, .ie7 .old_browser_only { display: block; }
+
+/* until angular releases 1.2 */
+.ng-hide {
+    display: none;
+}
+
+/* Allow developer's request to show the whole program to override hiding. */
+/* Note that adjoining classes like this are bad practice for browser */
+/* compatibility, but since it's a developer's feature, I don't care. */
+.ng-hide.show-all {
+    display: inherit;
+}
+
+/* disabled buttons should look different */
+/* todo: check that this works in IE */
+button[disabled] {
+    background-color: gray;
+    cursor: default;
+}
+
+/* student and educator agreement boxes */
+
+.agreement {
+    margin: 20px;
+    height: 300px;
+    overflow: scroll;
+    border: 1px solid #ddd; /* very-light-gray */
+    padding: 10px;
+}
+
+/* invalid warnings next to text boxes */
+
+form i.icon-warning-sign {
+    color: #f15a23; /* orange */
+    margin-left: 10px;
+}
+
+.obvious_link {
+    color: #3C77E0; /* perts-medium-blue */
+    text-decoration: underline;
+}
+
+.obvious_link:hover {
+    color: #015597; /* perts-dark-blue */
+    text-decoration: underline;
+}
+
+button i {
+    color: white;
+}
+
+/* this is the right way to make a link look like a button */
+
+a.button {
+    -webkit-font-smoothing: auto;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    padding: 6px 20px;
+    vertical-align: middle;
+}
+
+a.button:hover {
+    text-decoration: none;
+}
+
+.perts.blue_button { 
+    background-color: #3C77E0; /* perts-medium-blue */
+}
+
+.perts.blue_button:hover {
+    background: #333; /* dark-gray */
+}
+
+/* the PERTS header and contained user messages */
+#logo {
+    float: left;
+    margin-right: 20px;
+}
+
+#logo img {
+    height: 54px;
+    margin: 10px 0 0 20px;
+}
+
+#header .center {
+    margin-right: 0px;
+    text-align: center;
+}
+
+.user_message {
+    font-style: italic;
+    border-width: 1px 1px 1px 4px;
+    border-style: solid;
+    background-image: none;
+    margin-top: 15px;
+    padding: 10px;
+}
+
+#main-nav {
+    /* make sure menu stays above any fixed headers (e.g. on dashboard) */
+    position: relative;
+    z-index: 10;
+}
+
+/* styled selects */
+/* The idea is to suppress the browser's native rendering and style a div */
+/* wrapped around it instead. */
+.styled-select {
+    width: 200px;
+    position: relative;
+    display: inline-block;
+}
+
+.styled-select.ng-hide {
+    display: none;
+}
+
+.styled-select select {
+    color: #333; /* dark-gray */
+    width: 90%;
+    background: transparent;
+    appearance: none;
+    /* for chrome: */
+    -webkit-appearance: none;
+    /* for firefox, see: */
+    /* http://stackoverflow.com/questions/6787667/what-is-the-correct-moz-appearance-value-to-hide-dropdown-arrow-of-a-select#answer-18327666 */
+    -moz-appearance: none;
+    text-indent: 0.01px;
+    text-overflow: '';
+    position: relative;
+    /* Keeps the select element above the dropdown arrow icon. */
+    /* Otherwise, a click on the icon wouldn't register as a click on the */
+    /* select element. */
+    z-index: 2;
+    border-color: #ccc; /* light-gray */
+}
+
+.styled-select select:hover {
+    border-color: #ddd; /* very-light-gray */
+}
+
+.styled-select i, .styled-select label  {
+    position: relative;
+    left: -20px;
+}
+
+.styled-select i {
+    width: 12px;
+    height: 15px;
+    background: url('/static/css/chosen-sprite.png') no-repeat 0px 2px;
+    position: relative;
+    display: inline-block;
+}
+
+/* Hide native dropdown arrow in IE 10 and up */
+.styled-select select::-ms-expand {
+    display: none;
+}
+
+/* Hide artificial dropdown arrow in IE 9 and down */
+.ie8 .styled-select i, .ie9 .styled-select i  {
+    display: none;
+}
+
+/* Make chosen selects look like styled selects */
+
+.chosen-container-single .chosen-single {
+    height: 34px;
+    line-height: 34px;
+}
+
+.chosen-container-single .chosen-single div b {
+    background: url(chosen-sprite.png) no-repeat 0 7px;
+}
+
+.chosen-container-active.chosen-with-drop .chosen-single div b {
+    background-position: -18px 7px
+}
+
+.chosen-container-single .chosen-single,
+.chosen-container-active.chosen-with-drop .chosen-single,
+.chosen-container-single .chosen-drop {
+    border-radius: 0;
+    background: #fff;
+}
+
+input.datepickr {
+    background-color: rgb(240, 193, 193); /* perts-pale-red (for ie) */
+    background-color: rgba(224, 130, 130, 0.5); /* perts-pale-red */
+    width: 75px;
+    color: #333; /* dark-gray */
+}
+
+input.datepickr.valid {
+    background-color: white;
+}
+
+/* simple, css-only dropdown menus */
+/* adapted from http://line25.com/tutorials/how-to-create-a-pure-css-dropdown-menu */
+/* not tested in IE! */
+nav.dropdown ul {
+    padding: 0 20px;
+    list-style: none;
+    position: relative;
+    display: inline-table;
+}
+
+nav.dropdown ul ul {
+    display: none;
+}
+
+nav.dropdown ul li:hover > ul {
+    display: block;
+}
+
+nav.dropdown ul:after {
+    content: "";
+    clear: both;
+    display: block;
+}
+
+nav.dropdown ul li {
+    float: left;
+}
+
+nav.dropdown ul li:hover {
+    background: #f6f6f6; /* extremely-light-gray */
+}
+
+nav.dropdown ul li:hover span {
+    color: #333; /* dark-gray */
+}
+
+nav.dropdown ul li span {
+    padding: 15px 20px;
+    display: block;
+    color: #333; /* dark-gray */
+    text-decoration: none;
+}
+
+nav.dropdown ul ul {
+    background: #f6f6f6; /* extremely-light-gray */
+    padding: 0;
+    position: absolute;
+    top: 100%;
+}
+
+nav.dropdown ul ul li {
+    float: none;
+    position: relative;
+    margin: 0;
+}
+
+nav.dropdown ul ul li span {
+    padding: 10px 20px;
+    cursor: pointer;
+    /*color: orange;*/
+}
+
+nav.dropdown ul ul li span:hover {
+    background: #02AFF0; /* perts-light-blue */
+}
+
+nav.dropdown ul ul ul {
+    position: absolute;
+    left: 100%;
+    top: 0;
+}
+
+/* ------------------------ */
+/* the standalone datepickr */
+/* ------------------------ */
+
+input.datepickr {
+    cursor: pointer;
+}
+
+.calendar {
+    font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+    font-size: 0.9em;
+    background-color: #ddd; /* very-light-gray */
+    color: #333;
+    border: 1px solid #ddd; /* very-light-gray */
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    padding: 0.2em;
+}
+
+.calendar .months {
+    /*background-color: #F6AF3A;*/
+    background-color: #015597; /* perts-dark-blue */
+    border: 1px solid #E78F08;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    color: #FFF;
+    padding: 0.2em;
+    text-align: center;
+}
+
+.calendar .prev-month,
+.calendar .next-month {
+    padding: 0;
+}
+
+.calendar .prev-month {
+    float: left;
+}
+
+.calendar .next-month {
+    float: right;
+}
+
+.calendar .current-month {
+    margin: 0 auto;
+}
+
+.calendar .months .prev-month,
+.calendar .months .next-month {
+    color: #FFF;
+    text-decoration: none;
+    padding: 0 0.4em;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.calendar .months .prev-month:hover,
+.calendar .months .next-month:hover {
+    background-color: #FDF5CE;
+    color: #C77405;
+}
+
+.calendar table {
+    border-collapse: collapse;
+    padding: 0;
+    font-size: 0.8em;
+    width: 100%;
+    margin: 0;
+}
+
+.calendar th {
+    text-align: center;
+}
+
+.calendar td {
+    text-align: center;
+    padding: 1px;
+    width: 14.3%;
+}
+
+.calendar td span {
+    display: block;
+    color: #1C94C4;
+    background-color: #f6f6f6; /* extremely-light-gray */
+    border: 1px solid #ccc; /* light-gray */
+    text-decoration: none;
+    padding: 0.2em;
+    cursor: pointer;
+}
+
+.calendar td span:hover {
+    color: #C77405;
+    background-color: #FDF5CE;
+    border: 1px solid #FBCB09;
+}
+
+.calendar td.selected span {
+    background-color: #015597; /* perts-dark-blue */
+    color: white;
+}
+
+.calendar td.today span {
+    background-color: #FFF0A5;
+    border: 1px solid #FED22F;
+    color: #363636;
+}
+
+.calendar td.disabled span {
+    color: #ccc;
+    cursor: default;
+}
+
+.calendar td.disabled span:hover {
+    color: #ccc;
+    background-color: #F6F6F6;
+    border: 1px solid #CCC;
+}
+
+/* ------------------------------------------------ */
+/* some things that smartstart appears to get wrong */
+/* ------------------------------------------------ */
+
+/* use bootstrap's spanX notation! */
+.tab-content .two-third {
+    /* cam: needed in Chrome */
+    width: 590px;
+}
+
+/* we don't want the header to change height, no matter what */
+/* b/c then the transparent background and border of header get misaligned */
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+    #header { height: 70px; }
+}
+
+@media only screen and (max-width: 767px) {
+    #header { height: 70px; }
+}
+
+/* ---------------------------------------------- */
+/* make the smartstart header thinner (less tall) */
+/* these px values are all 16 less than original  */
+/* ---------------------------------------------- */
+
+html #header {
+    height: 70px;
+}
+
+html #main-nav a {
+    padding-bottom: 24px;
+}
+
+html #main-nav ul ul {
+    top: 76px;
+}
+
+
+/* --------------------------------- */
+/* modify smartstart where it's ugly */
+/* --------------------------------- */
+
+.success, .error, .info, .notice {
+    background-image: none;
+    font-family: FontAwesome;
+    -webkit-font-smoothing: antialiased;
+    padding: 10px;
+}
+
+.success:before {
+    content: "\f164\00a0";
+}
+
+.error:before {
+    content: "\f071\00a0";
+}
+
+/* --------------------------------------------------- */
+/* extend smartstart link styles to arbitrary elements */
+/* --------------------------------------------------- */
+
+.pseudolink:hover, .pseudolink > *:hover {
+    color: #015597; /* perts-dark-blue */
+    text-decoration: underline;
+}
+
+.pseudolink, .pseudolink > * {
+    color: #333; /* dark-gray */
+    text-decoration: underline;
+    cursor: pointer;
+    -webkit-transition: background-color .2s ease, border .2s ease, color .2s ease, opacity .2s ease-in-out;
+    -moz-transition: background-color .2s ease, border .2s ease, color .2s ease, opacity .2s ease-in-out;
+    -ms-transition: background-color .2s ease, border .2s ease, color .2s ease, opacity .2s ease-in-out;
+    -o-transition: background-color .2s ease, border .2s ease, color .2s ease, opacity .2s ease-in-out;
+    transition: background-color .2s ease, border .2s ease, color .2s ease, opacity .2s ease-in-out;
+}
+
+/* -------------------------------------------------- */
+/* extend smartstart to allow non-anchor tags in tabs */
+/* -------------------------------------------------- */
+
+.tabs-nav li span {
+    background: #f6f6f6; /* extremely-light-gray */
+    border: 1px solid #ddd; /* very-light-gray */
+    border-bottom: 1px solid #ddd; /* very-light-gray */
+    border-left: none;
+    color: #959393;
+    display: block;
+    letter-spacing: 0;
+    outline: none;
+    padding: 0 16px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #fff;
+}
+
+.tabs-nav li:first-child span {
+    border-left: 1px solid #ddd; /* very-light-gray */
+}
+
+.tabs-nav li span:hover {
+    background: #ddd; /* very-light-gray */
+}
+
+.tabs-nav li span:hover, .tabs-nav li.active span {
+    color: #015597; /* perts-dark-blue */
+}
+
+.tabs-nav li.active span  {
+    background: #fff;
+    border-bottom: 2px solid #fff;
+    border-top: 1px solid #015597; /* perts-dark-blue */
+}
+
+.tabs-nav li.disabled span, .tabs-nav li.disabled a {
+    color: #ddd;
+    text-shadow: none;
+}
+
+.tabs-nav li.disabled span:hover {
+    background: #f6f6f6; /* extremely-light-gray */
+}
+
+/* ------------------------------------------- */
+/* collisions between smartstart and bootstrap */
+/* ------------------------------------------- */
+
+
+body {
+    /* matches bootstrap; smartstart sets it at #909090, which is much too light */
+    color: #333;
+}
+
+
+.dropdown-menu li {
+    margin: 0 5px;
+}
+
+.dropdown-menu th {
+    vertical-align: middle;
+}
+
+/* bootstrap adds a:hover underline globally; we don't want this in the header */
+/* or the footer */
+#header a:hover, #footer a:hover {
+    text-decoration: none;
+}
+
+#footer li {
+    line-height: inherit;
+}
+
+select, textarea, input[type="text"], input[type="password"],
+input[type="datetime"], input[type="datetime-local"], input[type="date"],
+input[type="month"], input[type="time"], input[type="week"],
+input[type="number"], input[type="email"], input[type="url"],
+input[type="search"], input[type="tel"], input[type="color"],
+.uneditable-input {
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    background-color: #fff;
+    border: 1px solid #ccc; /* light-gray */
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    -webkit-transition: border linear .2s,box-shadow linear .2s;
+    -moz-transition: border linear .2s,box-shadow linear .2s;
+    -o-transition: border linear .2s,box-shadow linear .2s;
+    transition: border linear .2s,box-shadow linear .2s;
+}
+
+blockquote {border-left: none;}
+
+blockquote p {
+    margin-bottom: 20px;
+    font-size: 100%;
+    font-weight: normal;
+    line-height: 1.6;
+}
+
+.icons-ul li {
+    margin-left: 0;
+}
+
+form button {
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
+
+
+/* ----------------------------------- */
+/* modify angular bootstrap directives */
+/* ----------------------------------- */
+
+/* these are for the angular datepicker, which doesn't work in IE */
+/*.datepicker table, ul.datepicker li {
+    margin-bottom: 0;
+}
+
+.datepicker td, .datepicker th {
+    padding: 2px 2px;
+    background: none;
+}
+
+.datepicker .btn {
+    border  : none;
+    background-image: none;
+    margin      : 0px;
+    padding: 2px 3px;
+}
+*/
+
+/* ------------------------------------------------------------------------- */
+/* temporary styles, to be removed when we start to seriously work on the UI */
+/* ------------------------------------------------------------------------- */
+
+fieldset {
+    border: 1px solid #ddd; /* very-light-gray */
+    padding: 10px;
+}
+
+legend {
+    font-weight: bold;
+    /* prevents overly-wide legends from overlapping fieldset border */
+    width: auto;
+}
+
+/* ------------------------------- */
+/* Support fixed navigation bar    */
+/* and footer that stick to bottom */
+/* ------------------------------- */
+
+/* pad body so that it does not overlap */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    padding-top: 70px;
+    margin-bottom: 250px;
+}
+
+.navbar-fixed-top {
+    height: 70px;
+    /* Keep smart start style border */
+    border-top: 6px solid #333; /* dark-gray */
+    /* change from default black background to white */
+    /* use 'background' not 'background-color' b/c of an ie bug */
+    /* http://css-tricks.com/ie-background-rgb-bug/ */
+    background: rgb(255, 255, 255);  /* fallback for ie 6 + 7 */
+    background: rgba(255,255,255,0.95);;
+}
+
+#sticky_footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+/* smartstart applies a margin-top to #footer; we don't need that b/c we */
+/* have a margin-bottom on body */
+#footer {
+    margin-top: 0;
+}
+
+/* fixed positioning doesn't work in ie 6 */
+.ie6 body { padding: 0; }
+
+.ie6 .navbar-fixed-top {
+    position: relative;
+}
+
+#godbar .align-right {
+    line-height: 1.5em;
+}
+
+/* ----------------------- */
+/* Administration controls */
+/* ----------------------- */
+
+/* not displayed by default */
+.admin-control {
+    display: none;
+}
+
+
+/* -------- */
+/* Printing */
+/* -------- */
+
+/* affects printing */
+/* http://stackoverflow.com/questions/1542320/margin-while-printing-html-page */
+@page {
+    /* auto is the initial value */ 
+    size: auto;
+    /* this affects the margin in the printer settings */ 
+    margin: 20mm 20mm 20mm 20mm;  
+    #content button, #content a.button {
+        background: transparent !important;
+    }
+}
+
+@media all {
+    .page-break { display: none; }
+}
+
+@media print {
+    body {
+        border: none;
+        padding-top: 0;
+        margin-bottom: 0;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+
+    body .print-only {
+        display: inherit;
+    }
+
+    .page-break {
+        display: block;
+        page-break-before: always;
+    }
+
+    .navbar-fixed-top {
+        display: none;
+    }
+
+    #content {
+        padding-top: 0;
+    }
+}
+
+.print-only {
+    display: none;
+}

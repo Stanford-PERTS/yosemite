@@ -1,0 +1,90 @@
+<div class="row" ng-show="showAddForm">
+    <div id="add_school" class="span12">
+        <fieldset>
+            <i class="pull-right icon-remove close-button"
+               ng-click="showAddForm = false"></i>
+                <!-- In Yosemite, schools and cohorts get created at the same time. -->
+                <!-- This creates both. -->
+                <form name="addSchoolForm" onsubmit="return false">
+                    <label>
+                        State:
+                        <select chosen-select data-placeholder="..."
+                                select-options="stateAbbreviations"
+                                ng-model="schoolState" class="state" required
+                                ng-options="abbr for abbr in stateAbbreviations">
+                            <!-- Empty option tag works around bug in chosen plugin. -->
+                            <!-- http://stackoverflow.com/questions/19369250/uncaught-typeerror-cannot-set-property-selected-of-undefined -->
+                            <option value=""></option>
+                        </select>
+                    </label>
+                    <label>
+                        Name:
+                        <input type="text" ng-model="schoolName" required
+                               placeholder="school name">
+                    </label>
+                    <!-- In Yosemite, there's only one program. Javascript will fill it in. -->
+                    <!-- The school and cohort will have the same name, and the cohort code -->
+                    <!-- will be generated automaticaly. Pretty nifty. -->
+
+                    <button ng-disabled="addSchoolForm.$invalid"
+                            ng-click="addSchool()">
+                        Add
+                    </button>
+                </form>
+        </fieldset>
+    </div>
+</div>
+
+<div class="row dashboard-table-controls">
+    <div class="span9">
+        <input type="text" ng-model="searchText" placeholder="Search...">
+    </div>
+    <div id="action_buttons" class="span3">
+        <button ng-click="showAddForm = true"
+                ng-disabled="showAddForm || $root.userType == 'school_admin'"
+                class="pull-right">
+            <i class="icon-plus"></i>&nbsp;&nbsp;Add School
+        </button>
+    </div>
+</div>
+
+<table class="dashboard-table cohort_progress_list">
+    <colgroup>
+        <col ng-repeat="col in columns" class="[[col.colClass]]" span="1">
+    </colgroup>
+    <thead>
+        <!-- This first row is essentially categories of columns. The colX
+        classes allow us to apply borders only on certain columns. -->
+        <tr>
+            <th colspan="2" class="col0 col1"><!-- blank --></th>
+            <th colspan="4" class="col2 col3 col4 col5">
+                Classroom Session Status
+            </th>
+            <th class="col6"><!-- blank --></th>
+            <th class="col7"><!-- blank --></th>
+            <th colspan="5" class="col8 col9 col10 col11 col12">
+                Certified Study Eligible Students
+            </th>
+        </tr>
+        <tr ng-class="{'reverse-sort': reverseSort}">
+            <th ng-repeat="col in columns" ng-click="sortBy($index)"
+                ng-class="{sortable: col.sortable, 'sorting-active': sortedColumn == $index}"
+                class="[['col' + $index]]">
+                <span tooltip="[[col.tooltip]]">[[ col.name ]]</span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr aggregate-cohort-progress bindonce="row"
+            ng-repeat="row in pageList"
+            show-cohort-column="true" cohort-ids="[[ row.cohortIds ]]"
+            activity-ordinal="[[ row.activityOrdinal ]]"></tr>
+    </tbody>
+</table>
+
+<div class="empty-table-hint" ng-show="searchList.length == 0">
+    [[ emptyTableMessage ]]
+</div>
+
+<div table-page-nav></div>
+

@@ -1,0 +1,16 @@
+<h4>Details of [[cohort.name]]</h4>
+<label for="cohortBasics_name">Name</label>
+<input type="text" id="cohortBasics_name" ng-model="cohort.name">
+<label for="cohortBasics_code">Code</label>
+<input type="text" id="cohortBasics_code" ng-model="cohort.code"
+       disabled="disabled">
+
+<!-- <label for="cohortBasics_status">Status</label>
+<input type="text" id="cohortBasics_status" ng-model="cohort.status">
+<label for="cohortBasics_promisedStudents">Promised # of Students</label>
+<input type="text" id="cohortBasics_promisedStudents" ng-model="cohort.promised_students">
+<label for="cohortBasics_anomalyNotes">Anomaly Notes</label>
+<input type="text" id="cohortBasics_anomalyNotes" ng-model="cohort.anomaly_notes">
+ -->
+<button ng-click="deleteCohort(cohort)">
+    <i class="icon-trash"></i>&nbsp;&nbsp;delete school</button>

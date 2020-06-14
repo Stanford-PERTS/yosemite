@@ -1,0 +1,44 @@
+{# A redirection page for the teacher panel. The cohort must be determined #}
+{# before progressing. #}
+{# The "Home" button points here for teachers. #}
+
+{% extends "base.html" %}
+
+{% block title %}
+Teacher
+{% endblock %}
+
+{% block header %}
+<script type="text/javascript">
+
+function CohortChooserController($scope, $pertsAjax, $window) {
+    'use strict';
+    $pertsAjax({url: '/api/get/cohort'}).then(function (response) {
+        $scope.cohortList = response;
+    });
+    $scope.goToTeacherPanel = function () {
+        // Redirect to self, the server will take care of the rest.
+        $window.location.href = '/teacher?cohort=' + $scope.selectedCohortId;
+    };
+}
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+    <div ng-controller="CohortChooserController">
+        <h1>Which school would you like to manage?</h1>
+        <form name="cohortChooser">
+            <label>
+                Your cohort:<br>
+                <select styled-select ng-options="c.id as c.name for c in cohortList"
+                        ng-model="selectedCohortId" required></select>
+            </label>
+            <button ng-click="goToTeacherPanel()"
+                    ng-disabled="cohortChooser.$invalid">go</button>
+        </form>
+    </div>
+
+
+{% endblock %}

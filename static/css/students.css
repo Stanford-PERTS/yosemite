@@ -1,0 +1,443 @@
+/* ------------------------------------------------------ */
+/* Basic things the platform needs (normally in main.css) */
+/* ------------------------------------------------------ */
+
+#loading {
+    background-color: white;
+    width: 100%;
+    height: 500px;
+    text-align: center;
+    padding-top: 200px;
+    font-size: 3em;
+    color: gray;
+}
+
+.ie6 #loading {
+    /* the loading screen just doesn't work on ie6 */
+    display: none;
+}
+
+#loading p.notice {
+    font-size: 16px;
+    width: 60%;
+}
+
+.old_browser_only { display: none; }
+.ie6 .old_browser_only, .ie7 .old_browser_only { display: block; }
+
+/* until angular releases 1.2 */
+.ng-hide {
+    display: none;
+}
+
+/* Allow developer's request to show the whole program to override hiding. */
+/* Note that adjoining classes like this are bad practice for browser */
+/* compatibility, but since it's a developer's feature, I don't care. */
+.ng-hide.show-all {
+    display: inherit;
+}
+
+/* ------------------------------------------ */
+/* end basic stuff, begin Matt Kandler's work */
+/* ------------------------------------------ */
+
+html {
+  background-color: #e3e3e3;
+}
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+a, .pseudolink {
+  cursor: pointer;
+  color: #3C77E0;
+}
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    content: "";
+    clear: both;
+    height: 0;
+}
+.cohort-loading {
+  margin-left: 15px;
+  position: relative;
+  top: 6px;
+}
+.students-paths h2:before {
+  content: "";
+}
+.students-paths #program_navigation {
+  border-top: none;
+  margin-top: 20px;
+  padding: 0px;
+  font-size: 21px;
+  line-height: 30px;
+  height: 30px;
+  text-align: center;
+}
+.students-paths #program_navigation .previous {
+  display: none;
+}
+.full-container.students-paths {
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  background-color: #e3e3e3;
+  font-family: "museo-sans", 'Arial', sans-serif;
+  color: #404040;
+}
+.full-container.students-paths .page {
+  padding: 10px 0px;
+}
+.students-paths #header {
+  display: block;
+  padding: 0px;
+  height: 80px;
+  background-color: #3FAEEC;
+}
+.students-paths #footer {
+  background-color: #e3e3e3;
+  height: 80px; 
+}
+.students-paths #footer .foot-text{
+  padding-top: 26px;
+  text-align: center;
+  font-family: "din-condensed-web", 'Arial', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  color: #999;
+}
+.students-paths .outer-container {
+  position: relative;
+  width: 100%;
+  background-color: #fff;
+  margin: 0px;
+}
+.students-paths .inner-container {
+  position: relative;
+  width: 770px;
+  margin: 0px auto;
+  padding: 30px 0px;
+  min-height: 550px;
+}
+.students-paths .inner-container.with-nav {
+  padding-bottom: 100px;
+}
+.students-paths h1 {
+  color: #4593d5;
+  font-size: 24px;
+  margin-bottom: 30px;
+  font-weight: 700;
+}
+.students-paths p {
+  font-family: "museo-sans", 'Arial', sans-serif;
+  font-size: 21px;
+  line-height: 30px;
+  margin: 25px 0px 15px 0px;
+  font-weight: 300;
+}
+.students-paths label {
+  display: block;
+  margin-top: 10px;
+}
+.students-paths .radio-label {
+  display: inline-block;
+  position: relative;
+  top: -1px;
+}
+.students-paths ul.menu {
+  padding: 0px;
+}
+.students-paths ul.menu li {
+  margin: 0px;
+}
+.students-paths ul.menu li:before {
+  content: none;
+}
+/* Custom bullet lists */
+
+.students-paths ul {
+  margin-top: 20px;
+  margin-bottom: 20px;    
+}
+.students-paths .page ul li{
+  font-family: "museo-sans", 'Arial', sans-serif;
+  font-size: 18px;
+  line-height: 28px;
+  color: #666;
+  list-style: none;
+  margin-bottom: 3px;
+  font-weight: 300;
+}
+.students-paths ul li:before {
+  content: "";
+  height: 12px;
+  width: 12px;
+  background-color: #3faeec;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  -khtml-border-radius: 6px;
+  border-radius: 6px;
+  position: absolute;
+  display: block;
+  margin-top: 8px;
+  left: 12px;
+}
+.students-paths .callout-text {
+  font-size: 21px;
+  line-height: 30px;
+  font-style: italic;
+  color: #4593d5;
+  margin: 30px 0px;
+  font-weight: 500;
+}
+.students-paths .instruction-text {
+  font-size: 18px;
+  color: #999;
+  font-style: italic;
+  margin-bottom: 25px;
+}
+.students-paths .footnote-text {
+  font-size: 14px;
+  color: #999;
+  margin-bottom: 25px;
+}
+.students-paths .perts-button {
+  display: block;
+  margin: 0px auto 45px auto;
+  box-shadow: none;
+  background-color: #3faeec;
+  width: 300px;
+  padding: 12px 3px;
+  font-size: 18px;
+  color: #fff;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -khtml-border-radius: 5px;    
+  border-radius: 5px;
+  border: 0px solid;
+  text-align: center;
+  font-weight: 300;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+}
+.students-paths input {
+  height: 50px;
+  border: 0;
+  outline: 0;
+  /* Padding-top seemed too thick in IE 8, pushing text below center */
+  /*padding: 15px;*/
+  padding: 12px 15px;
+  margin: 12px 10px 12px 0;
+  font-size: 21px;
+  font-weight: 300;
+  color: #404040;
+  /* Seems unnecessary, and was making text not centered in IE 8 */
+  /*line-height: 28px;*/
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -khtml-border-radius: 0px;
+  border-radius: 0px;
+}
+.students-paths button {
+  display: inline-block;
+  vertical-align: top;
+  box-shadow: none;
+  background-color: #3faeec;
+  padding: 15px 20px;
+  margin: 11px 0 0 0;
+  font-size: 18px;
+  color: #fff;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -khtml-border-radius: 5px;    
+  border-radius: 5px;
+  border: none;
+  text-align: center;
+  font-weight: 300;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+}
+.students-paths button[disabled="disabled"] {
+  background-color: #7bc7f1;
+}
+.students-paths button.block-button {
+  display: block;
+}
+.students-paths .open-response {
+  background-color: #3faeec;
+  margin: 20px 0px;
+  padding: 15px;
+}
+.students-paths .open-response .open-response_header {
+  color: #fff;
+  padding-bottom: 15px;
+}
+.students-paths .open-response textarea.open-response_input {
+  width: 100%;
+  height: 600px;
+  border: 0;
+  outline: 0;
+  padding: 15px;
+  font-size: 18px;
+  font-weight: 300;
+  color: #404040;
+  line-height: 28px;
+  background-color: #fff;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -khtml-border-radius: 0px;
+  border-radius: 0px;
+  resize: none;
+}
+
+/* styled selects */
+/* The idea is to suppress the browser's native rendering and style a div */
+/* wrapped around it instead. */
+.styled-select {
+  position: relative;
+  display: inline-block;
+  /* Matt's input {margin} rule goes here, b/c this div wraps the select. */
+  margin: 12px 0px;
+}
+
+.styled-select.ng-hide {
+  display: none;
+}
+
+.styled-select select {
+  color: #333; /* dark-gray */
+  background: transparent;
+  appearance: none;
+  /* for chrome: */
+  -webkit-appearance: none;
+  /* for firefox, see: */
+  /* http://stackoverflow.com/questions/6787667/what-is-the-correct-moz-appearance-value-to-hide-dropdown-arrow-of-a-select#answer-18327666 */
+  -moz-appearance: none;
+  text-indent: 0.01px;
+  text-overflow: '';
+  position: relative;
+  /* Keeps the select element above the dropdown arrow icon. */
+  /* Otherwise, a click on the icon wouldn't register as a click on the */
+  /* select element. */
+  z-index: 2;
+  border-color: #ccc; /* light-gray */
+  vertical-align: middle;
+
+  /* Copying Matt's <input> styles */
+  border: 0;
+  outline: 0;
+  margin: 0;
+  font-size: 21px;
+  font-weight: 300;
+  color: #404040;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -khtml-border-radius: 0px;
+  border-radius: 0px;
+  padding: 12px 15px;
+}
+
+.styled-select i, .styled-select label  {
+  position: relative;
+  left: -20px;
+}
+
+.styled-select i {
+  width: 12px;
+  height: 15px;
+  background: url('/static/css/chosen-sprite.png') no-repeat 0px 2px;
+  position: relative;
+  top: -5px;
+  display: inline-block;
+  /* Keep the down-arrow in the middle */
+  vertical-align: text-bottom;
+}
+
+/* Hide native dropdown arrow in IE 10 and up */
+.styled-select select::-ms-expand {
+    display: none;
+}
+
+/* Hide artificial dropdown arrow in IE 9 and down */
+.ie8 .styled-select i, .ie9 .styled-select i  {
+    display: none;
+}
+
+input[type="radio"] {
+    margin-top: 12px;
+    margin-right: 12px;
+    height: 18px; 
+    position: relative;
+    cursor: pointer;   
+}
+/* Styling for input radio box, needs some redoing w/ labels... */
+input[type="radio"]:after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -2px;
+    height: 20px;
+    width: 20px;
+    background-color: white;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -khtml-border-radius: 10px;    
+    border-radius: 10px;
+    border: 2px solid #666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+/* Matt: I stole this from your CSS sheet on qualtrics. Looks pretty good. */
+/* If you approve, you can remove this comment. */
+input[type="radio"]:checked:after {
+  background-color: #4593d5;
+  border: 2px solid #4593d5;
+}
+
+/* Strip all radio styles from ie 10 and down, b/c they don't work */
+.ie8 input[type="radio"], .ie9 input[type="radio"],
+.ie10 input[type="radio"]  {
+    margin: 0;
+    border: none;
+    padding: 0;
+    height: auto;
+    position: relative;
+    cursor: pointer;
+}
+
+/* without fancy radio buttons, the label and the button */
+/* are a little too close */
+.ie8 .students-paths .radio-label, .ie9 .students-paths .radio-label,
+.ie10 .students-paths .radio-label {
+    margin-left: 10px;
+}
+
+/* Matt: This still has the old qualtrics selectors on it. What's it do? */
+/* Should it be removed? */
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px)  {
+  .Skin .MC input[type="radio"]:after {
+    content: none;
+  }
+}

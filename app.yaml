@@ -1,0 +1,126 @@
+#application: s~yosemiteplatform
+# This line means that requests to yosemiteplatform.appspot.com (and any
+# domain that aliases it, like studentspaths.org) will go to this module by
+# default.
+module: default
+#version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+# 256 MB, 1.2 GHz, $0.10/hr.
+# https://developers.google.com/appengine/docs/python/modules/#instance_classes
+instance_class: F2
+
+# "based on request rate, response latencies, and other application metrics"
+automatic_scaling:
+  min_idle_instances: 5
+  # "amount of time that App Engine should allow a request to wait in the
+  # pending queue before starting a new instance to handle it"
+  min_pending_latency: 40ms
+  max_pending_latency: 3.0s
+
+handlers:
+- url: /initialize_connection
+  script: connection.app
+  login: admin
+  secure: always
+
+- url: /gae_mini_profiler/static
+  static_dir: gae_mini_profiler/static
+
+- url: /gae_mini_profiler/.*
+  script: gae_mini_profiler.main.application
+
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+  secure: always
+
+- url: /static
+  static_dir: static
+  secure: always
+  # Allow cross-domain requests for these resources.
+  # https://developers.google.com/appengine/docs/python/config/appconfig#cors_support
+  http_headers:
+    Access-Control-Allow-Origin: '*'
+
+- url: /programs/(.+?)/static/(.*)
+  static_files: programs/\1/static/\2
+  upload: programs/(.+?)/static/(.*)
+  secure: always
+  # Allow cross-domain requests for these resources.
+  # https://developers.google.com/appengine/docs/python/config/appconfig#cors_support
+  http_headers:
+    Access-Control-Allow-Origin: '*'
+
+- url: /api.*
+  script: api_handlers.app
+  secure: always
+
+- url: /cron.*
+  script: cron_handlers.app
+  # Make sure that the big bad internet can't hit our cron URLs.
+  # https://developers.google.com/appengine/docs/python/config/cron#Python_app_yaml_Securing_URLs_for_cron
+  login: admin
+  secure: always
+
+# A simple control panel for starting and viewing mapreduce jobs. Handled
+# by code in the mapreduce library.
+- url: /mapreduce(/.*)?
+  # Yes, the APP is in upper case. Yes, it's annoying. Leave it alone.
+  script: mapreduce.main.APP
+  login: admin
+  secure: always
+
+# URLs to initiate our map reduce jobs.
+- url: /map.*
+  script: map_handlers.app
+  login: admin
+  secure: always
+
+- url: /task.*
+  script: task_handlers.app
+  login: admin
+  secure: always
+
+# Only app admins can run tests
+- url: /unit_test.*
+  script: test_handlers.app
+  login: admin
+  secure: always
+
+- url: /robots.txt
+  static_files: static/robots.txt
+  upload: robots.txt
+
+- url: .*
+  script: page_handlers.app
+  secure: always
+
+builtins:
+# We never use appstats. Disabling.
+# - appstats: on
+- remote_api: on
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+- name: jinja2
+  version: latest
+
+skip_files:
+# default
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+# package managers
+- ^.*node\_modules$
+# SDK files
+- datastore.db
+- sdk_logs
+- logs.db
+- logs.db-journal
+- search_indexes
+- xsrf

@@ -1,0 +1,14 @@
+<label>Schools</label>
+<br>
+<div class="row">
+    <div class="span8">
+        <span ng-repeat="c in ownedCohorts | orderBy: 'name'" class="school">
+            [[ c.name ]]
+            <i class="icon-remove" ng-click="disownCohort(c.id)"
+               ng-show="canEditCohort()"></i>
+        </span>
+    </div>
+    <div class="span3" ng-show="canEditCohort()">
+        <div cohort-associator user-id="[[ user.id ]]" ></div>
+    </div>
+</div>

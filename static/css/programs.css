@@ -1,0 +1,274 @@
+/* ----------- */
+/* auto hiding */
+/* ----------- */
+
+.autohide {
+    opacity: 0;
+}
+
+.autohide:hover {
+    opacity: 0.5;
+}
+
+/* the focused class is applied during tabbed navigation, improves accessibility */
+.page .focused {
+    opacity: 1;
+}
+
+.page .focused.autohide {
+    opacity: 0.65;
+}
+
+.page_divider {
+    display: none;
+}
+
+.show-all .page_divider {
+    display: block;
+}
+
+.ie .autohide, .ie .autohide label {
+    zoom: 1;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /* first! */
+    filter: alpha(opacity=0);                   /* second! */
+}
+
+.ie .autohide:hover, .ie .autohide:hover label  {
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /* first! */
+    filter: alpha(opacity=50);
+}
+
+.ie .page .focused {
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"; /* first! */
+    filter: alpha(opacity=100);
+}
+
+.ie .page .focused.autohide {
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"; /* first! */
+    filter: alpha(opacity=65);
+}
+
+.ie .focused label {
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"; /* first! */
+    filter: alpha(opacity=100);
+}
+
+h2 {
+    color: black;
+}
+
+h2:before {
+    content: "\f054";
+    font-family: FontAwesome;
+    -webkit-font-smoothing: antialiased;
+    margin-right: 8px;
+    color: #f15a23; /* smartstart orange */
+}
+
+input[type='radio'] {
+    margin-right: 10px;
+}
+
+p {
+    color: #333; /* dark-gray */
+    font-size: 17px;
+    font-family: helvetica, arial, freesans, clean, sans-serif;
+}
+
+textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    height: 150px;
+    border: 1px solid #333; /* dark-gray */
+    color: #333; /* dark-gray */
+}
+
+
+div.video_block{
+    background-color: #F1F1F1;
+    width: 100%;
+    margin-top:18px;
+    margin-bottom:10px;
+    padding:18px 5px 10px 5px;
+    border-top:1px gray solid;
+    border-bottom:1px gray solid;
+}
+
+div.question_block{
+    background-color: #E1F3FC;
+    width: 100%;
+    margin-top:10px;
+    margin-bottom:10px;
+    padding:10px 5px 10px 5px;
+    border-top:1px #02AFF0 solid;
+    border-bottom:1px #02AFF0 solid;
+}
+
+/* iframe div for ipad height control */
+/* http://stackoverflow.com/questions/6139564/iframe-size-on-ipad */
+.iframe_container {
+    -webkit-overflow-scrolling: touch;
+    overflow: auto;
+    height: 250px;
+    border: 1px solid gray;
+    margin-bottom: 20px;
+}
+
+.iframe_container iframe {
+    height: 97%;
+    width: 100%;
+}
+
+.quiet {
+    color: #ccc; /* light-gray */
+    font-style: italic;
+    font-size: 10px;
+}
+
+.pseudolink {
+    color: #3C77E0; /* perts-medium-blue */
+}
+
+.pseudolink:hover {
+    color: #015597; /* perts-dark-blue */
+}
+
+.page ul li,.page ol li {
+    color: #333; /* dark-gray */
+    font-size: 17px;
+    font-family: helvetica, arial, freesans, clean, sans-serif;
+    line-height: 2em;
+}
+
+.page .last figure {
+    margin-left: 10px;
+}
+
+.module_header {
+    background-color: #01AEF0;
+    color: white;
+    font-size: 12px;
+    padding: 8px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.page {
+    padding: 10px 10px 10px 20px;
+}
+
+.question_text{
+    margin-top: 1.5em;
+    margin-bottom: 1em;
+}
+
+.question_text:before {
+    content: "\f101\0020"; /* icon-double-angle-right and a space */
+    font-family: FontAwesome;
+    -webkit-font-smoothing: antialiased;
+    color: #f15a23; /* smartstart orange */
+}
+
+.response_text{
+    font-size: 14px;
+    margin: .5em;
+    padding: .5em;
+    margin-bottom: 2em;
+}
+
+.response_text label {
+    padding-left: 35px;
+    text-indent: -35px;
+}
+
+.response_text label input {
+    position: relative;
+    top: -4px;
+}
+
+#program_navigation {
+    margin-top: 15px;
+    padding: 10px;
+    width:100%;
+    border-top:1px solid #efefef;
+}
+
+#program_description p{
+    font-weight: bold;
+}
+
+#variable_integrity_readout{
+    display: none;
+}
+
+.nav_link {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.next i, .previous i {
+    position: relative;
+    top: 2px;
+}
+
+.nav_link.next {
+    /* color: #015597; */ /* perts-dark-blue */
+}
+
+.menu li {
+    list-style: none;
+    margin: 15px;
+}
+
+.menu li button {
+    display: inline;
+    font-size: 1.2em;
+}
+
+.module_menu_message button {
+    margin-right: 10px;
+}
+
+.module_menu_message span {
+    visibility: hidden;
+}
+
+.module_menu_message:hover span {
+    visibility: visible;
+}
+
+#header div.user_message_container {
+    /* program app users don't need to see all the saving that's happening */
+    display: none;
+}
+
+.user_message.info{
+    font-size: 12px;
+    background-color: white;
+    border: none;
+}
+
+#mindset_quotes td:hover {
+    background-color: #b3dbea; /* perts-light-blue */
+}
+
+.session_progress p{
+    border-bottom: 1px solid gray;
+}
+
+.session_progress li.past{
+    color: #ccc; /* light-gray */
+}
+
+.session_progress li.current{
+    font-weight:bold;
+}
+
+ol.letter_list {
+    list-style-type:lower-alpha;
+}
+
+

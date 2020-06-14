@@ -1,0 +1,973 @@
+/* Basic setup and formatting */
+
+html #SurveyEngineBody {
+    background: none;
+    background-color: #e3e3e3;
+    font-family: "museo-sans", 'Arial', sans-serif;
+    color: #404040;
+}
+.Skin {
+    background-color: #fff;
+}
+.Skin .Separator {
+    margin: 2px 0px;
+}
+.SkinInner {
+    width: 100%;
+    background-color: #fff;
+    margin: 0px;
+}
+.Skin #Logo {
+    display: none;
+}
+.Skin #Header {
+    position: relative;
+    display: block;
+    padding: 0px;
+    height: 80px;
+    background-color: #3FAEEC;
+}
+.Skin #Footer {
+    background-color: #e3e3e3;
+    height: 80px;
+}
+.Skin #Footer .foot-text{
+    padding-top: 26px;
+    text-align: center;
+    font-family: "din-condensed-web", 'Arial', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    color: #999;
+}
+.Skin #Questions {
+    padding: 0px;
+    min-height: 400px;
+}
+.Skin .QuestionOuter {
+    padding: 0px;
+    overflow-x: auto;
+    -ms-overflow-x: auto;
+    -ms-overflow-style: auto;
+}
+.Skin .QuestionOuter .Inner {
+    padding: 0px;
+    /* Prevent wide content from scrolling, and prevent horiz scrollbar */
+    overflow-x: hidden;
+}
+.Skin #ProgressBar {
+    display: none;
+}
+
+/* Custom multiple choice inputs */
+
+.Skin .content-spacer {
+    margin-top: 30px;
+    display: block;
+    position: relative;
+    width: 100%;
+}
+.Skin .QuestionBody, .Skin .MC .QuestionText, .Skin .TE .QuestionText,
+.Skin .Matrix .QuestionText {
+    display: block;
+    width: 770px;
+    margin: 0px auto;
+    position: relative;
+}
+/* In the case of Matrix-style questions (with tables) */
+/* Qualtrics automatically copies the QuestionText into */
+/* the table <caption>. Normally you don't see this b/c */
+/* there's a base style of caption {display: none}. We need */
+/* to make sure the caption stays hidden despite the */
+/* display: block instruction above. */
+.Skin .Matrix caption.QuestionText {
+    display: none;
+}
+.Skin .MC .QuestionBody {
+    margin: 20px auto 25px auto;
+}
+.Skin .MC .QuestionText {
+    font-weight: 300;
+    font-size: 21px;
+    color: #404040;
+}
+.Skin .QuestionText {
+    margin: 0px;
+}
+li span.LabelWrapper {
+    font-weight: 300;
+    font-size: 21px;
+    color: #404040;
+}
+.Skin .QuestionBody table.ChoiceStructure.narrow-table {
+    width: 300px;
+    margin-top: 25px;
+}
+.Skin .QuestionBody table.ChoiceStructure.narrow-table td {
+    padding: 12px 0;
+}
+table span.LabelWrapper {
+    font-weight: 500;
+    font-size: 15px;
+    color: #404040;
+    margin: 0px 10px;
+    display: block;
+}
+.Skin .MC table {
+    margin-bottom: 55px;
+}
+.Skin .MC li input.radio {
+    margin-top: 8px;
+    margin-right: 18px
+}
+.Skin .MC input[type="radio"] {
+    position: relative;
+    margin-top: 6px;
+    cursor: pointer;
+}
+.Skin .MC input[type="radio"]:after {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    background-color: white;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    border-radius: 10px;
+    border: 2px solid #666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+@media only screen
+and (min-device-width : 768px)
+and (max-device-width : 1024px)  {
+    .Skin .MC input[type="radio"]:after {
+        content: none;
+    }
+}
+.Skin .MC td input[type="radio"]:after {
+    top: -1px;
+    left: -4px;
+}
+.Skin .MC li input[type="radio"]:after {
+    top: -2px;
+    left: -2px;
+}
+.Skin .MC input[type="radio"]:checked:after {
+    background-color: #4593d5;
+    border: 2px solid #4593d5;
+}
+.Skin .ML *, .Skin .SL *{
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+/* Checkboxes */
+.Skin .MC input.checkbox {
+    position: relative;
+    margin: 10px 15px;
+}
+.Skin .MC input.checkbox:after {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: -6px;
+    height: 20px;
+    width: 20px;
+    background-color: white;
+    border: 2px solid #666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+@media only screen
+and (min-device-width : 768px)
+and (max-device-width : 1024px)  {
+    .Skin .MC input.checkbox:after {
+        content: none;
+    }
+}
+.Skin .MC input.checkbox:checked:after {
+    background-color: #4593d5;
+    border: 2px solid #4593d5;
+}
+.Skin .ML .ChoiceStructure, .Skin .SL .ChoiceStructure.ChoiceStructureStyled {
+    background-color: #3faeec;
+    padding: 35px 6px 6px 6px;
+    margin: 30px 0px;
+    position: relative;
+}
+.Skin .ML .ChoiceStructure textarea, .Skin .SL .ChoiceStructure.ChoiceStructureStyled input {
+    width: 100% !important;
+    height: 250px !important;
+    border: 0;
+    outline: 0;
+    padding: 15px;
+    font-size: 21px;
+    font-weight: 300;
+    color: #404040;
+    line-height: 28px;
+    background-color: #fff;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    -khtml-border-radius: 0px;
+    border-radius: 0px;
+}
+.Skin .SL .ChoiceStructure.ChoiceStructureStyled input {
+    height: 50px !important;
+    margin: 0px;
+}
+.open-response_header {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    color: #fff;
+}
+
+/* Buttons - Next and Back */
+
+/* For typical re-styling of next button. */
+#Buttons #NextButton,
+/* For the "blocked navigation" button. */
+#FakeNextButton,
+/* Important if the .perts-button is replacing a nav button in the #Buttons */
+/* container. */
+#Buttons .perts-button,
+/* Important if the .perts-button is in question text, like the audio test */
+/* play button. */
+.perts-button {
+    display: block;
+    margin: 0px auto 45px auto;
+    box-shadow: none;
+    background-color: #3faeec;
+    width: 300px;
+    padding: 12px 3px;
+    font-size: 18px;
+    color: #fff;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    border: 0px solid;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 300;
+    font-style: normal;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+}
+#Buttons #NextButton:hover, #FakeNextButton:hover, #Buttons .perts-button:hover {
+    background-color: #368dbe;
+}
+#FakeNextButton {
+    position: absolute;
+    bottom: 0px;
+    right: 110px;
+    cursor: pointer;
+}
+#Buttons #NextButton:active, #Buttons .perts-button:active {
+    top: 0px;
+    box-shadow: none;
+}
+#Buttons #NextButton.disabled-button {
+    background-color: #7bc7f1;
+    cursor: default;
+}
+#Buttons #NextButton.disabled-button:hover {
+    background-color: #7bc7f1;
+    cursor: default;
+}
+a#BackButton {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    color: #999;
+    font-size: 18px;
+    font-family: "din-condensed-web", 'Arial', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+}
+a#BackButton:hover {
+    color: #666;
+    cursor: pointer;
+}
+#Buttons input#PreviousButton {
+    display: none;
+}
+
+/* Text formatting */
+
+#section-header {
+    text-align: center;
+    padding: 0px 0px 45px 0;
+    color: #999;
+    font-size: 18px;
+    font-family: "din-condensed-web", 'Arial', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+}
+.Skin h1, .Skin #title-text {
+    color: #4593d5;
+    font-size: 24px;
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+.Skin p {
+    font-size: 21px;
+    line-height: 30px;
+    margin: 15px 0px;
+    font-weight: 300;
+}
+.callout-text {
+    font-size: 21px;
+    line-height: 30px;
+    font-style: italic;
+    color: #4593d5;
+    margin: 30px 0px;
+    font-weight: 500;
+}
+.instruction-text {
+    font-size: 18px;
+    color: #999;
+    font-style: italic;
+    margin-bottom: 25px;
+}
+.footnote-text {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 25px;
+}
+
+/* Setting up custom containers */
+
+#main-content *, #split-page *, #splash-page * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+#main-content {
+    display: block;
+    width: 770px;
+    min-height: 450px;
+    margin: 30px auto 20px auto;
+    position: relative;
+}
+#split-page {
+    display: block;
+    width: 1020px;
+    min-height: 650px;
+    margin: 0px auto;
+    position: relative;
+}
+#split-text {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 30px;
+    width: 510px;
+    padding: 0px 20px;
+    height: 650px;
+    position: relative;
+}
+#split-image {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: 500px;
+    height: 680px;
+    overflow: hidden;
+}
+#split-image .image-caption{
+    position: absolute;
+    text-align: center;
+    bottom: 0px;
+    width: 100%;
+    height: 95px;
+    color: #999;
+    font-size: 18px;
+    font-style: italic;
+}
+#splash-page {
+    display: block;
+    width: 770px;
+    min-height: 450px;
+    margin: 100px auto 20px auto;
+    position: relative;
+    text-align: center;
+}
+#splash-page h1 {
+    font-size: 32px;
+}
+
+/* Hidden container */
+
+.hidden-container {
+
+}
+.hidden-container.hidden-container--hidden {
+    display: none;
+}
+
+/* Formatting multiple columns */
+
+.columns{
+    display: block;
+    width: 100%;
+    margin: 30px 0px;
+}
+.columns .col {
+    display: inline-block;
+    vertical-align: top;
+}
+.columns .col .perts-quote {
+    padding-right: 0px;
+}
+.col:first-child{
+    margin-right: 30px;
+}
+.col.col-4 {
+    width: 250px;
+}
+.col.col-4.narrow {
+    width: 200px;
+}
+.col.col-8 {
+    width: 480px;
+}
+.col.col-8.wide {
+    width: 530px;
+}
+.col.col-8.wide.extra-padding{
+    margin-left: 60px;
+    width: 450px;
+}
+
+/* PERTS Quotes! */
+
+.perts-quote {
+    display: block;
+    width: 100%;
+    position: relative;
+    margin: 30px 0px 30px -30px;
+    border-left: 4px solid #3faeec;
+    padding: 10px 0px 10px 30px;
+    font-weight: 300;
+}
+.perts-quote:before {
+    display: block;
+    content: "";
+    width: 32px;
+    height: 36px;
+    position: absolute;
+    top: 0px;
+    left: -29px;
+    background-image: url("https://www.studentspaths.org/programs/SP/static/img/perts-quote-mark.png");
+    background-repeat: no-repeat;
+}
+.perts-quote_body {
+    font-size: 21px;
+    color: #666;
+    line-height: 32px;
+    font-style: italic;
+}
+.perts-quote_credit {
+    font-size: 21px;
+    margin-top: 30px;
+    color: #4593d5;
+    font-weight: 500;
+}
+.perts-quote_credit.credit--top {
+    margin-top: 0px;
+    margin-bottom: 20px;
+}
+.perts-quote.perts-quote--light {
+    padding: 0px 0px 0px 20px;
+    margin: 20px 0px 20px -20px;
+}
+.perts-quote.perts-quote--light:before {
+    display: none;
+}
+.perts-quote.perts-quote--light .perts-quote_credit {
+    font-size: 18px;
+    margin-top: 15px;
+    color: #4593d5;
+    font-weight: 500;
+}
+
+/* Image blocks */
+
+.image-block {
+    display: block;
+    margin: 30px auto;
+    text-align: center;
+}
+.image-block .image-block_caption {
+    margin: 5px 0px;
+    color: #999;
+}
+.col-4 .image-block {
+    margin: 15px auto;
+    max-width: 100%;
+}
+.col-4 .image-block.image-block--quote {
+    margin: 45px auto 0px auto;
+}
+.col-4 .image-block.image-block--padded {
+    margin: 30px auto;
+}
+.image-block#intro-image {
+    height: 150px;
+    width: 400px;
+}
+.image-block#neuron-image {
+    background-image: url("https://www.studentspaths.org/programs/SP/static/img/neuron-interactive.png");
+    height: 680px;
+    width: 500px;
+    margin: 0px;
+    background-color: #f0f1f2;
+    position: relative;
+}
+.image-block#brain-lobes {
+    background-image: url("https://www.studentspaths.org/programs/SP/static/img/brain-lobes.png");
+    height: 680px;
+    width: 500px;
+    margin: 0px;
+    background-color: #f0f1f2;
+    position: relative;
+}
+.image-block#equation-image {
+    background-image: url("https://www.studentspaths.org/programs/SP/static/img/tough-equation.png");
+    height: 310px;
+    width: 250px;
+}
+.image-block#chile-data {
+    background-image: url("https://www.studentspaths.org/programs/SP/static/img/chile-graph.png");
+    background-color: #fff;
+    height: 680px;
+    padding-top: 30px;
+    width: 500px;
+    margin: 0px;
+}
+.image-block#iphone-image {
+    background-image: url("https://www.studentspaths.org/programs/SP/static/img/iphone.png");
+    height: 300px;
+    width: 250px;
+    margin: 0px auto;
+}
+.image-block#michelle-image {
+    background-image: url("https://www.studentspaths.org/programs/SP/static/img/michelle-obama.png");
+    height: 264px;
+    width: 200px;
+    margin: 40px auto;
+}
+
+/* Image insets */
+
+.image-inset-right {
+    float: right;
+    margin-left: 20px;
+    margin-top: 20px;
+}
+
+/* Custom bullet lists */
+
+.Skin ul.perts-bullets, .Skin ol.perts-bullets {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.Skin ul.perts-bullets li, .Skin ol.perts-bullets li {
+    font-size: 21px;
+    line-height: 30px;
+    color: #666;
+    list-style: none;
+    margin-bottom: 3px;
+    font-weight: 300;
+}
+.Skin ul.perts-bullets, .Skin ul.perts-bullets li,
+.Skin .QuestionText ul.perts-bullets, .Skin .QuestionText ul.perts-bullets li {
+    list-style-type: none;
+}
+.Skin ul.perts-bullets li:before {
+    content: "";
+    height: 12px;
+    width: 12px;
+    background-color: #3faeec;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -khtml-border-radius: 6px;
+    border-radius: 6px;
+    position: absolute;
+    display: block;
+    margin-top: 8px;
+    left: 12px;
+}
+.Skin #split-text ul.perts-bullets li:before {
+    left: 30px;
+}
+
+/* User input fields (open-response and short-form) */
+
+.open-response {
+    background-color: #3faeec;
+    margin: 20px 0px;
+    padding: 15px;
+}
+.open-response .open-response_header {
+    color: #fff;
+    padding-bottom: 15px;
+}
+.Skin .open-response textarea.open-response_input {
+    width: 100%;
+    height: 250px;
+    border: 0;
+    outline: 0;
+    padding: 15px;
+    font-size: 21px;
+    font-weight: 300;
+    color: #404040;
+    line-height: 28px;
+    background-color: #fff;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    -khtml-border-radius: 0px;
+    border-radius: 0px;
+}
+.Skin input.short-form, .Skin input[type="TEXT"] {
+    border-style: none;
+    border: 1px solid #ccc;
+    font-size: 21px;
+    font-weight: 300;
+    padding: 10px 15px;
+    margin: 0px;
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background-color: #fff;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    -khtml-border-radius: 0px;
+    border-radius: 0px;
+}
+.Skin input[type="TEXT"] {
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.Skin .MC input.TextEntryBox.InputText {
+    left: 0px;
+    margin: 5px 0px 15px 0px;
+}
+
+/* Custom input - select many */
+
+.select-many {
+    margin: 30px 0px;
+    width: 100%;
+    text-align: center;
+}
+.select-many_option {
+    position: relative;
+    display: inline-block;
+    margin: 20px 15px;
+    padding: 10px;
+    height: 260px;
+    width: 220px;
+    background-color: #f6f9fb;
+    vertical-align: top;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: center;
+}
+.select-many_option:hover {
+    border: 5px solid #3faeec;
+    cursor: pointer;
+}
+.select-many_option.selected {
+    background-color: #c5e7f9;
+}
+.select-many_option .option-image {
+    display: inline-block;
+    margin: 15px auto 0px auto;
+    position: relative;
+    height: 120px;
+    width: 120px;
+}
+.select-many_option .option-text {
+    font-size: 18px;
+    line-height: 26px;
+    position: absolute;
+    width: 100%;
+    padding: 0px 10px;
+    bottom: 20px;
+    left: 0px;
+    font-weight: 300;
+}
+.select-many_option:hover .option-image {
+    margin-top: 10px;
+}
+.select-many_option:hover .option-text {
+    bottom: 15px;
+    /* There's a 5px border on hover, so shrink padding by matching */
+    /* amount to avoid content wiggle. */
+    padding: 0 5px;
+}
+.select-many_option .option-image#option-1 {
+    background-image: url('https://www.studentspaths.org/programs/SP/static/img/option-1-fixed.png');
+}
+.select-many_option .option-image#option-2 {
+    background-image: url('https://www.studentspaths.org/programs/SP/static/img/option-2-fixed.png');
+}
+.select-many_option .option-image#option-3 {
+    background-image: url('https://www.studentspaths.org/programs/SP/static/img/option-3-fixed.png');
+}
+.smarter-option {
+    display: inline-block;
+    position: relative;
+    width: 370px;
+    margin: 25px 12px;
+    height: 300px;
+    background-color: #eee;
+    overflow: hidden;
+}
+.smarter-option.smarter-option--1 {
+    background-image: url('https://www.studentspaths.org/programs/SP/static/img/option-easy-work.png');
+    margin-left: 0px;
+}
+.smarter-option.smarter-option--2 {
+    background-image: url('https://www.studentspaths.org/programs/SP/static/img/option-hard-work.png');
+    margin-right: 0px;
+}
+.smarter-option:hover .smarter-option_label {
+    top: 150px;
+}
+.smarter-option_label {
+    position: absolute;
+    width: 100%;
+    left: 0px;
+    top: 300px;
+    -webkit-transition-property: top 0.5s ease;
+    -moz-transition-property: top 0.5s ease;
+    -o-transition-property: top 0.5s ease;
+    transition: top 0.5s ease;
+    height: 150px;
+    background-color: rgba(0,0,0,0.65);
+    color: #fff;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 20px;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 300;
+}
+
+/* Slider toggle */
+
+.perts-slider-outer {
+    width: 94px;
+    height: 27px;
+    overflow: hidden;
+    position: relative;
+    float: right;
+    z-index: 10;
+
+}
+.perts-slider {
+    background: url('http://labs.engageinteractive.co.uk/itoggle/images/itoggle.png') 0 -27px;
+    width: 147px;
+    height: 27px;
+    margin-left: -53px;  /* "off" state */
+    cursor: pointer;
+}
+.perts-slider.disabled {
+    opacity: 0.25;
+    filter: alpha(opacity=25); /* For IE8 and earlier */
+    cursor: default;
+}
+
+/* Neuron interaction */
+
+.neuron-part, .brain-lobe {
+    position: absolute;
+    display: block;
+    height: 26px;
+    width: 26px;
+    border-radius: 16px;
+    -webkit-border-radius: 16px;
+    -moz-border-radius: 16px;
+    -khtml-border-radius: 16px;
+    background-color: #fff;
+    border: 6px solid #3faeec;
+    box-shadow: 0px 0px 6px rgba(0,0,0,0.6);
+    -webkit-box-shadow: 0px 0px 6px rgba(0,0,0,0.6);
+    -moz-box-shadow: 0px 0px 6px rgba(0,0,0,0.6);
+}
+.neuron-part#neuron-part--cell-body {
+    left: 110px;
+    top: 330px;
+}
+.neuron-part#neuron-part--axon {
+    left: 290px;
+    top: 345px;
+}
+.neuron-part#neuron-part--dendrites {
+    left: 85px;
+    top: 250px;
+}
+.brain-lobe#brain-lobe--frontal {
+    left: 110px;
+    top: 230px;
+}
+.brain-lobe#brain-lobe--frontal .part-caption {
+    right: -55px;
+}
+.brain-lobe#brain-lobe--temporal {
+    left: 260px;
+    top: 330px;
+}
+.brain-lobe#brain-lobe--occipital {
+    left: 415px;
+    top: 300px;
+}
+.brain-lobe#brain-lobe--parietal {
+    left: 300px;
+    top: 210px;
+}
+.neuron-part:hover, .brain-lobe:hover {
+    background-color: #3faeec;
+    border: 6px solid #368dbe;
+}
+.neuron-part .part-caption, .brain-lobe .part-caption {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    width: 150px;
+    text-align: center;
+    font-style: bold;
+    background-color: #fff;
+    padding: 10px;
+    border: 2px solid #999;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+}
+.neuron-part .part-caption {
+    left: 0px;
+}
+.brain-lobe .part-caption {
+    right: 0px;
+}
+.neuron-part:hover .part-caption, .brain-lobe:hover .part-caption{
+    display: block;
+}
+
+/* Audio toggle in header (default is OFF) */
+#audio-toggle-wrapper {
+    display: block;
+    position: absolute;
+    right: 30px;
+    top: 22px;
+    height: 25px;
+    width: 120px;
+    border: 5px solid;
+    border-color: transparent;
+    background: transparent;
+    padding: 3px 17px 2px 3px;
+}
+#audio-toggle {
+    height: 100%;
+    cursor: pointer;
+    background: url('//www.studentspaths.org/programs/SP/static/img/audio-sprite.png') 0 0;
+}
+#audio-toggle:hover {
+    background-position: 0 125px;
+}
+#audio-toggle.disabled, #audio-toggle.disabled:hover {
+    cursor: auto;
+    background-position: 0 100px;
+}
+#audio-toggle.on {
+    background-position: 0 75px;
+}
+#audio-toggle.on:hover {
+    background-position: 0 50px;
+}
+#audio-toggle.on.disabled, #audio-toggle.on.disabled:hover {
+    background-position: 0 25px;
+}
+
+/* On browsers which use the (visible) embedded media player, move it */
+/* outside the viewport. Giving it display: none; will break it. */
+.perts-audio-embed {
+    position: absolute;
+    /* Player is normally 320 x 22 px. This positions it offscreen. */
+    top: -30px;
+    left: -330px;
+}
+
+/* Hide timing questions during previews so they look more realistic. */
+
+.QuestionOuter.Timing {
+    display: none;
+}
+
+.QuestionOuter.Timing:before {
+    content: "A timing question on this page has been hidden. This message is visible only during survey preview.";
+    font-size: 8px;
+    color: #eee;
+    font-style: italics;
+}
+
+/* Fixes for iPhone and iPad */
+
+@media only screen and (max-device-width: 1024px) and (min-device-width: 768px) {
+    /* Qualtrics applies a 90% max width here. Stupid. */
+    html #SurveyEngineBody.iOS .Skin .SkinInner,
+    html #SurveyEngineBody.Android .Skin .SkinInner {
+        max-width: 100%;
+    }
+}
+
+/* iOS controls are bigger, so we need to adjust the ::after bits (which */
+/* skin the native controls by floating over them). */
+#SurveyEngineBody.iOS .Skin .MC input.checkbox::after {
+    top: -1px;
+    left: -1px;
+    height: 30px;
+    width: 30px;
+}
+
+#SurveyEngineBody.iOS  .Skin .MC td input[type="radio"]::after,
+#SurveyEngineBody.iOS  .Skin .MC li input[type="radio"]::after {
+    top: -1px;
+    left: -1px;
+}
+#SurveyEngineBody.iOS .Skin .MC input[type="radio"]::after {
+    height: 30px;
+    width: 30px;
+    border-radius: 15px;
+}
+
+/* Qualtrics tries to put in a weird checkmark thingy in iPads. Kill it. */
+#SurveyEngineBody.iOS input[type="checkbox"]:checked::after,
+#SurveyEngineBody.Android input[type="checkbox"]:checked::after {
+    content: "";
+    background: #4593d5;
+}

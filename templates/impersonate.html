@@ -1,0 +1,189 @@
+{# Impersonate existing users, or creating new ones for testing, or create #}
+{# demo accounts for sharing content with third parties. #}
+
+{% extends 'base.html' %}
+
+{% block header %}
+
+<script>
+
+var currentlyImpersonating = {{ 'true' if currently_impersonating else 'false' }};
+var userId = '{{ normal_user.id }}';
+
+</script>
+<script type="text/javascript" src="/static/js/impersonate.js"></script>
+
+<style>
+hr {
+    margin: 20px 0;
+}
+
+.pseudocode {
+    font-family: monospace;
+}
+
+.disabled {
+    color: lightgray;
+}
+
+.button_hint button {
+    margin-right: 10px;
+}
+
+.button_hint span {
+    visibility: hidden;
+}
+
+.button_hint:hover span {
+    visibility: visible;
+}
+
+#commands {
+    overflow: scroll;
+    height: 160px;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div ng-controller="ImpersonateController">
+
+        <alert ng-show="$parent.alert" type="alert.type" close="alert=false">
+            [[ alert.msg ]]
+        </alert>
+
+    <div ng-show="currentlyImpersonating">
+        <p>
+            You are <strong>{{ normal_user.user_type }}
+            {{ normal_user.first_name }} {{ normal_user.last_name }}
+            ({{ normal_user.login_email }})</strong>, and you are
+            impersonating <strong>{{ user.user_type }} {{ user.first_name }}
+            {{ user.last_name }} ({{ user.login_email }})</strong>.
+        </p>
+        <p><a href="?page_action=stop_impersonating" class="button">
+            stop impersonating
+        </a></p>
+        <h2>Useful links</h2>
+
+        {% for info in program_link_info %}
+        <p><a href="{{ info['link'] }}">
+            Enter {{ info['user_type'] }} program: {{ info['program_name'] }}
+        </a></p>
+        {% endfor %}
+
+        {% if user.user_type == 'teacher' or user.user_type == 'school_admin' %}
+
+        <p><a href="/teacher">Go to Teacher Panel</a></p>
+
+        {% endif %}
+
+    </div>
+    <div ng-show="!currentlyImpersonating">
+        <h3>Impersonate a Researcher, School Admin, or Teacher</h3>
+        <div class="row">
+            <div class="span10">
+                <label>
+                    User's email or id: <input type="text" ng-model="email_or_id">
+                </label>
+                <p>[[ impersonationError ]]</p>
+                <button ng-click="impersonate(target)" ng-disabled="!email_or_id">start</button>
+            </div>
+        </div>
+        <hr style="border-bottom: 2px solid darkgray">
+        <h3>Create testing data</h3>
+        <div class="row">
+            <div class="span4">
+                <label ng-repeat="p in programList">
+                    <input type="radio"name="selectedProgram"
+                           ng-model="$parent.selectedProgram" ng-value="p">
+                    [[ p.abbreviation ]]
+                    <span ng-show="contexts[p.id].complete">(created)</span>
+                </label>
+
+                <button ng-click="createTestContext(selectedProgram)"
+                        ng-disabled="!selectedProgram">Create</button>
+                <!-- <pre id="commands"></pre> -->
+                <!-- <pre>[[ contexts | json: '  ']]</pre> -->
+            </div>
+            <pre class="span4" id="commands"></pre>
+        </div>
+        <hr>
+        <h3>Test as...</h3>
+        <div class="button_hint row">
+            <div class="span10">
+                <button ng-click="testAs('student')"
+                        ng-disabled="!contexts[selectedProgram.id].complete">
+                    Student
+                </button>
+                <button ng-click="testAs('teacher')"
+                        ng-disabled="!contexts[selectedProgram.id].complete">
+                    Teacher
+                </button>
+                <span ng-show="!contexts[selectedProgram.id].complete">
+                    Create test data for this program first.
+                </span>
+            </div>
+        </div>
+        <hr>
+        <h3>Generate instructions for a Demo</h3>
+        <div class="row">
+            <div class="span10">
+                <p>
+                    <span class="dropcap">1</span>
+                    Find all the URLs you want to demo, using the "Test As..."
+                    buttons above.
+                </p>
+                <p>
+                    <span class="dropcap">2</span>
+                    Create testing data for the program using the controls above.
+                </p>
+                <p>
+                    <span class="dropcap">3</span>
+                    Added a label for your link, then copy and paste the URL you
+                    would like to demo, and click "add link". You can add as
+                    many links as you would like, but they must all be from the
+                    same program.
+                </p>
+                <form name="demoUrlForm">
+                    Label:
+                    <input type='text' ng-model="newDemoLabel"></input>
+                    URL:
+                    <input type='text' ng-model="newDemoUrl"
+                           ng-pattern="demoUrlPattern" required></input>
+                    <button ng-click="newDemoURL()"
+                            ng-disabled="demoUrlForm.$invalid || !contexts[selectedProgram.id].complete">
+                            Add Link
+                    </button>
+                </form>
+                <p>
+                    <span class="dropcap">4</span>
+                    Send the instructions below to individuals who need a demo.
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div id="demo_user_instructions" class="pseudocode span10"
+                 ng-class="{disabled: !contexts[selectedProgram.id]}">
+                <p> <br><br>
+                    PERTS Demo Instructions<br>
+                    Each link below will take you directly to a specific location in a PERTS program.
+                    When prompted, enter the demo credentials below to sign in.
+                    If you are not prompted to sign in or you experience difficulties, you may need to sign out, click on the desired link, and then sign back in.
+                    <br><br>
+                    Username: &nbsp;&nbsp; [[ contexts[selectedProgram.id].teacher.login_email ]]
+                    <br>
+                    Password: &nbsp;&nbsp; startdemo
+                </p>
+                <p> Demo URLs:      
+                    <span ng-repeat="demo in contexts[selectedProgram.id].demoUrls"
+                          class="pseudocode">
+                        <br><a href="[[ demo.url ]]">[[ demo.label || demo.url ]]</a>
+                    </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

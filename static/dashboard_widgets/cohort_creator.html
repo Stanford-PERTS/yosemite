@@ -1,0 +1,16 @@
+<h3>Add a cohort</h3>
+<form name="addCohort" onsubmit="return false">
+    <label for="addCohort_name">Name</label>
+    <input id="addCohort_name" type="text" ng-model="cohortData.name" required>
+    <label for="addCohort_code">Code</label>
+    <input id="addCohort_code" type="text" ng-model="cohortData.code" required>
+    <label for="addCohort_school">School</label>
+    <select id="addcCohort_school" styled-select required
+            ng-model="cohortData.school"
+            ng-options="s.id as s.name for s in schoolList"></select>
+    <label for="addCohort_program">Program</label>
+    <select id="addCohort_program" styled-select required 
+            ng-model="cohortData.program"
+            ng-options="p.id as p.name for p in programList"></select>
+    <button ng-disabled="addCohort.$invalid" ng-click="submit()">Add</button>
+</form>

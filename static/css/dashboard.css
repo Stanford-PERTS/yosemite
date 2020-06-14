@@ -1,0 +1,669 @@
+fieldset {
+    background-color: #f6f6f6; /* extremely-light-gray */
+}
+
+#certify_button {
+    background-color: #f15a23; /* orange */
+}
+
+#certify_button[disabled] {
+    background-color: white;
+    color: #333; /* dark-gray */
+    border: 1px solid #ddd; /* very-light-gray */
+    cursor: default;
+}
+
+.makeup-button[disabled="disabled"] {
+    background-color: #f15a23; /* orange */
+}
+
+form[name="addCsvUsersForm"] button {
+    margin-top: 10px;
+}
+
+form[name="addCsvUsersForm"] img {
+    position: relative;
+    top: 12px;
+    margin-left: 10px;
+    margin-bottom: 0;
+}
+
+.row {
+    margin-bottom: 20px;
+}
+
+.teacher_progress col.entity {width: 10%;}
+.teacher_progress col.activity {width: 8%;}
+.teacher_progress col.date {width: 25%;}
+.teacher_progress col.status {width: 27%;}
+.teacher_progress col.participants {width: 12%;}
+.teacher_progress col.time {width: 18%;}
+
+.dashboard-table-controls > div > * {
+    margin-left: 7px;
+}
+
+.dashboard-table-controls > div > *:first-child {
+    margin-left: 0;
+}
+
+.dashboard-table {
+    font-size: 0.8em;
+    /* Allows us to specify columns widths */
+    table-layout: fixed;
+    /* Prevent responsive width sizing for this table */
+    width: 940px;
+    max-width: none;
+}
+
+.dashboard-table tr {
+    background-color: #f6f6f6; /* extremely-light-gray */
+}
+
+.table-title {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.dashboard-table th, .dashboard-table td {
+    text-align: center;
+    border: none;
+    color: #555;
+}
+
+.dashboard-table th {
+    background-color: #f5f5fa; /* perts-ultra-pale blue */
+}
+
+.dashboard-table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.dashboard-table input {
+    margin: 0;
+    border-left: 1px solid #ddd; /* very-light-gray */
+    border-top: 1px solid #ddd; /* very-light-gray */
+    border-right: none;
+    border-bottom: none;
+}
+
+.dashboard-table th.sortable {
+    cursor: pointer;
+}
+
+.dashboard-table th.sorting-active {
+    color: #02AFF0; /* perts-light-blue */
+}
+
+.dashboard-table tr.reverse-sort th.sorting-active {
+    color: #3C77E0; /* perts-medium-blue */
+}
+
+/* Visual dividers between columns groups for program progress and */
+/* cohort progress */
+.program_progress_list .col1, .program_progress_list .col5,
+.program_progress_list .col6, .program_progress_list .col7,
+.program_progress_list .col12,
+.cohort_progress_list .col1, .cohort_progress_list .col5,
+.cohort_progress_list .col6, .cohort_progress_list .col7,
+.cohort_progress_list .col12,
+.classroom_progress_list .col5, .classroom_progress_list .col7,
+.classroom_progress_list .col12, .classroom_progress_list .col14,
+.roster_summary .col0, .roster_summary .col2, .roster_summary .col4,
+.roster_summary .col8
+{
+    border-right: 1px solid #ccc; /* light-gray */
+}
+
+.user_entry_list col.select                        {width: 4%;}
+.user_entry_list col.first_name                    {width: 18%;}
+.user_entry_list col.last_name                     {width: 18%;}
+.user_entry_list col.phone                         {width: 17%;}
+.user_entry_list col.registered                    {width: 17%;}
+.user_entry_list col.owned_schools                 {width: 17%;}
+.user_entry_list col.user_type                     {width: 7%;}
+
+.program_progress_list col.session                 {width: 8%;}
+.program_progress_list col.unscheduled             {width: 9%;}
+.program_progress_list col.behind                  {width: 9%;}
+.program_progress_list col.scheduled_completed     {width: 9%;}
+.program_progress_list col.total                   {width: 9%;}
+.program_progress_list col.incomplete_rosters      {width: 8%;}
+.program_progress_list col.uncertified             {width: 8%;}
+.program_progress_list col.study_eligible          {width: 8%;}
+.program_progress_list col.completed               {width: 8%;}
+.program_progress_list col.makeup_ineligible       {width: 8%;}
+.program_progress_list col.makeup_eligible         {width: 8%;}
+.program_progress_list col.uncoded                 {width: 8%;}
+/* sum: 100%; when the sum is > 100% things get funky; don't let it happen. */
+
+.cohort_progress_list col.name                     {width: 16%;}
+.cohort_progress_list col.session                  {width: 7%;}
+.cohort_progress_list col.unscheduled              {width: 7%;}
+.cohort_progress_list col.behind                   {width: 7%;}
+.cohort_progress_list col.scheduled_completed      {width: 7%;}
+.cohort_progress_list col.total                    {width: 7%;}
+.cohort_progress_list col.incomplete_rosters       {width: 7%;}
+.cohort_progress_list col.uncertified              {width: 7%;}
+.cohort_progress_list col.study_eligible           {width: 7%;}
+.cohort_progress_list col.complete                 {width: 7%;}
+.cohort_progress_list col.makeup_ineligible        {width: 7%;}
+.cohort_progress_list col.makeup_eligible          {width: 7%;}
+.cohort_progress_list col.uncoded                  {width: 7%;}
+/* sum: 100%; when the sum is > 100% things get funky; don't let it happen. */
+
+.classroom_progress_list col.select            {width: 4%;}
+.classroom_progress_list col.name              {width: 15%;}
+.classroom_progress_list col.roster            {width: 6%;}
+.classroom_progress_list col.session           {width: 4%;}
+.classroom_progress_list col.date              {width: 13%;}
+.classroom_progress_list col.status            {width: 14%;}
+.classroom_progress_list col.uncertified       {width: 6%;}
+.classroom_progress_list col.study_ineligible  {width: 6%;}
+.classroom_progress_list col.study_eligible    {width: 6%;}
+.classroom_progress_list col.complete          {width: 8%;}
+.classroom_progress_list col.makeup_ineligible {width: 6%;}
+.classroom_progress_list col.makeup_eligible   {width: 6%;}
+.classroom_progress_list col.uncoded           {width: 6%;}
+.classroom_progress_list col.notes           {width: 38%;}
+/* sum: 100%; when the sum is > 100% things get funky; don't let it happen. */
+
+.roster_table col.select           {width: 4%;}
+.roster_table col.classroom        {width: 19%;}  /* only on cohort level */
+.roster_table col.first_name       {width: 16%;}
+.roster_table col.last_name        {width: 16%;}
+.roster_table col.certified             {width: 19%;}  /* only on classroom level */
+.roster_table col.student_id       {width: 13%;}
+.roster_table col.session_progress {width: 6%;}
+.roster_table col.status_code      {width: 26%;}
+/* sum: 100%; when the sum is > 100% things get funky; don't let it happen. */
+
+/* Keep long names from overlowing their cell */
+.cohort_progress_list td.name,
+.classroom_progress_list td.name,
+.roster_table td.first_name,
+.roster_table td.last_name,
+.roster_table td.classroom {
+    -ms-word-break: break-all;
+    word-break: break-all;
+    /* Non standard for webkit */
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+}
+
+/* Hide most of second tr for student roster rows, like "merge cells". */
+/* Done by a more general rule that hides boths rows, and a more */
+/* specific one that unhides the :first-child. */
+tbody[school-roster-row] td.select,
+tbody[school-roster-row] td.first_name,
+tbody[school-roster-row] td.last_name,
+tbody[school-roster-row] td.student_id,
+tbody[school-roster-row] td.classroom,
+tbody[classroom-roster-row] td.select,
+tbody[classroom-roster-row] td.first_name,
+tbody[classroom-roster-row] td.last_name,
+tbody[classroom-roster-row] td.student_id,
+tbody[classroom-roster-row] td.certified
+{
+    display: none;
+}
+
+tbody[school-roster-row] tr:first-child td.select,
+tbody[school-roster-row] tr:first-child td.first_name,
+tbody[school-roster-row] tr:first-child td.last_name,
+tbody[school-roster-row] tr:first-child td.student_id,
+tbody[school-roster-row] tr:first-child td.classroom,
+tbody[classroom-roster-row] tr:first-child td.select,
+tbody[classroom-roster-row] tr:first-child td.first_name,
+tbody[classroom-roster-row] tr:first-child td.last_name,
+tbody[classroom-roster-row] tr:first-child td.student_id,
+tbody[classroom-roster-row] tr:first-child td.certified
+{
+    display: table-cell;
+}
+
+.roster_table tbody {
+    border-bottom: 1px solid #ccc; /* light-gray */
+}
+
+.roster_table tr.uploaded_by_admin,
+.roster_table tr.uploaded_by_admin:nth-child(even),
+.roster_table.makeups tr.uploaded_by_admin:nth-child(even) {
+    /*background-color: #f5fcf5;*/
+    background-color: #D8EDD8;
+}
+
+.roster_table tr:nth-child(even) td.session_progress,
+.roster_table tr:nth-child(even) td.status_code {
+    background-color: #f6f6f6; /* extremely-light-gray */
+}
+
+.roster_table tr:nth-child(odd) td.session_progress,
+.roster_table tr:nth-child(odd) td.status_code {
+    background-color: #ffffff;
+}
+
+.roster_table.makeups tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.roster_table td.certified .styled-select {
+    width: 125px;
+}
+
+.roster_table td.session_progress {
+    text-align: left;
+    padding-right: 0;
+}
+
+.roster_table td.first_name,
+.roster_table td.last_name,
+.roster_table td.student_id {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.roster_table td.student_id input {
+    width: 82px;
+}
+
+.roster_table td.student_id input[disabled] {
+    background-color: #f5f5f5;
+}
+
+.roster_table td.status_code .styled-select {
+    width: 240px;
+}
+
+.styled-select *[disabled] {
+    color: #ddd; /* very-light-gray */
+}
+
+.dashboard-table th button {
+    padding: 2px 4px;
+    font-size: 12px;
+}
+
+.dashboard-table td input {
+    color: #333; /* dark-gray */
+}
+
+/* Editable name fields */
+.dashboard-table td.first_name input,
+.dashboard-table td.last_name input,
+.dashboard-table td.phone input
+{
+    width: 120px;
+}
+
+.dashboard-table td.notes {
+    padding-top: 2px;
+    padding-bottom: 0;
+}
+
+.dashboard-table td.notes textarea {
+    height: 48px;
+    width: 90%;
+    padding-top: 1px;
+    padding-bottom: 0;
+    margin-top: 3px;
+    margin-bottom: 0;
+    color: #333; /* dark-gray */
+}
+
+.dashboard-table-controls input {
+    /* match the height of chosen selects so they line up nicely */
+    height: 25px;
+    margin-bottom: 0;
+}
+
+.dashboard-table-controls button {
+    height: 36px;
+    vertical-align: middle;
+    line-height: normal;
+}
+
+.dashboard-table-controls button.orange {
+    background-color: #f15a23; /* orange */
+    color: white;
+}
+
+.icon_button {
+    font-size: 1.25em;
+}
+
+.dashboard-table-controls a.button {
+    -webkit-font-smoothing: none;
+    height: 18px;
+    padding: 9px 20px;
+}
+
+.dashboard-table-controls a.button.icon_button,
+.dashboard-table-controls a[class*=" icon-"] {
+    font-size: 1.25em;
+    font-family: 'FontAwesome';
+}
+
+.user_entry_list .dashboard-table td.first_name input,
+.user_entry_list .dashboard-table td.last_name input,
+.user_entry_list .dashboard-table td.phone input
+{
+    width: 115px;
+}
+
+.dashboard-table input.datepickr,
+.dashboard-table input.time {
+    padding: 2px;
+    height: 18px;
+    width: 100px;
+    font-size: 10px;
+}
+
+.dashboard-table input.time.ng-invalid {
+    background-color: rgb(240, 193, 193); /* perts-pale-red (for ie) */
+    background-color: rgba(224, 130, 130, 0.5); /* perts-pale-red */
+}
+
+.dashboard-table .status .styled-select {
+    width: 120px;
+}
+
+.dashboard-table .user_type .styled-select {
+    width: 120px;
+}
+
+.dashboard-table .icon-warning-sign {
+    color: #f15a23; /* orange */
+}
+
+.dashboard-table .status .styled-select {
+    width: 120px;
+}
+
+.dashboard-table .icon-warning-sign {
+    color: #f15a23; /* orange */
+}
+
+/* Make the swappable status select look like the regular one. */
+.styled-select .fake-select {
+      border: 1px solid #ccc;
+      width: 200px;
+      height: 18px;
+      display: inline-block;
+      padding: 5px 7px;
+      vertical-align: middle;
+      text-align: left;
+      color: #333333;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 12px;
+      position: relative;
+      left: 2px;
+      cursor: pointer;
+}
+
+.activity_status.behind {
+    background-color: rgb(240, 193, 193); /* perts-pale-red (for ie) */
+    background-color: rgba(224, 130, 130, 0.5); /* perts-pale-red */
+}
+
+.activity_status.complete {
+    background-color: rgb(176, 247, 193);
+    background-color: rgba(176, 247, 193, 0.5);
+}
+
+.activity_status.aborted {
+    background-color: rgb(202, 202, 202);
+    background-color: rgba(202, 202, 202, 0.5);
+}
+
+.activity_status.unscheduled {
+    background-color: transparent;
+}
+
+.user_relationships .school {
+    display: inline-block;
+    padding: 0;
+    margin: 0 10px 5px 0;
+    border: 1px solid #ddd; /* very-light-gray */
+    background-color: #f6f6f6; /* extremely-light-gray */
+    width: 100px;
+}
+
+.user_relationships .school .school_label {
+    display: inline-block;
+    margin: 0;
+    padding: 3px 5px 3px 5px;
+    height: 100%;
+    background: transparent;
+    width: 75px;
+}
+
+.user_relationships .school .icon_container {
+    display: inline-block;
+    width: 8px;
+    margin: 0;
+    padding: 0 2px 0 0;
+    background-color: transparent;
+    vertical-align: top;
+}
+
+.user_relationships .school div i {
+
+}
+
+.user_relationships i {
+    cursor: pointer;
+}
+
+.user_relationships i:hover {
+    color: #f15a23; /* orange */
+}
+
+.breadcrumb-wrapper {
+    height: 34px;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+
+.crumb {
+    display: inline-block;
+    text-align: center;
+    position: relative;
+    height: 24px;
+
+    margin-top: 10px;
+    margin-right: 6px;
+    padding-right: 8px;
+    padding-left: 20px;
+    background-color: #015597; /* perts-dark-blue */
+    color: white;
+}
+
+.crumb a, .crumb a:hover {
+    color: white;
+}
+
+
+.crumb:after {
+    content: "";
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 12px solid #015597; /* perts-dark-blue */
+    position: absolute; right: -12px; top: 0;
+    z-index: 1;
+}
+
+.crumb:before {
+    content: "";
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 12px solid #f5f5fa; /* ultra-pale blue */
+    position: absolute; left: 0; top: 0;
+}
+
+.crumb.first:before {
+    border: none;
+}
+
+.crumb.last {
+    margin-right: 20px;
+    background-color: #f15a23; /* orange */
+    color: white;
+}
+
+.crumb.last:after {
+    content: "";
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 12px solid #f15a23; /* orange */
+    position: absolute; right: -12px; top: 0;
+    z-index: 1;
+}
+
+/* Have a blunt end for classrooms, because you can't go any deeper. */
+.crumb.last.classroom:after {
+    content: none;
+}
+
+#level_label {
+    margin-right: 10px;
+    color: #777; /* gray */
+}
+
+.tab {
+    height: 30px;
+    display: inline-block;
+    background-color: transparent;
+    padding: 5px 10px 0 10px;
+    color: black;
+}
+
+.tab.active {
+    background-color: white;
+    border-top: 1px solid #ccc; /* light-gray */
+    border-left: 1px solid #ccc; /* light-gray */
+    border-right: 1px solid #ccc; /* light-gray */
+    font-weight: bold;
+}
+
+th.sorting-active {
+    color: #02AFF0; /* perts-light-blue */
+}
+
+/* The !important here allows these to be visible during printing. */
+td.warning, .dashboard-table td.warning {
+    background-color: rgb(240, 193, 193) !important; /* perts-pale-red (for ie) */
+    background-color: rgba(224, 130, 130, 0.5) !important; /* perts-pale-red */
+}
+
+tr.warning, .dashboard-table tr.warning {
+    background-color: rgb(240, 193, 193) !important; /* perts-pale-red (for ie) */
+    background-color: rgba(224, 130, 130, 0.5) !important; /* perts-pale-red */
+}
+
+span.warning {
+    color: #FF5F5F;
+}
+
+.modal-body {
+    height: 400px;
+}
+
+/* for widgets */
+
+div[classroom-entry] .pull-left {
+    margin-right: 20px;
+}
+
+div[classroom-entry] .icon-remove-sign {
+    color: #f15a23; /* smartstart orange */
+}
+
+
+/* Imitates the styling of the site-wide header that remains in place as you */
+/* scroll down. Most of the magic is done by bootstrap classes applied to */
+/* this div. */
+#dashboard_fixed_header {
+    margin: 77px auto 0 auto;
+    border-top: none;
+    height: 79px;
+    border-bottom: 1px solid #ccc; /* light-gray */
+    width: 940px;
+    z-index: 5;
+    background-color: #f5f5fa; /* perts-ultra-pale blue */
+    padding-left: 10px;
+    border-top: 1px solid #ccc; /* light-gray */
+}
+
+#dashboard_fixed_header .row {
+    margin-bottom: 10px;
+}
+
+/* We have to push down the rest of the dashboard content since the nav bar */
+/* is no longer part of the normal flow, otherwise some content would be */
+/* permanently hidden beneath the nav bar. */
+#dashboard_content {
+    margin-top: 60px;
+}
+
+#add_school select.state {
+    width: 100px;
+}
+
+#add_school label {
+    display: inline-block;
+}
+
+#add_school input {
+    position: relative;
+    top: 5px;
+}
+
+#add_school button {
+    margin-bottom: 0;
+}
+
+#add_classroom input.ng-invalid.blurred {
+    background-color: rgb(240, 193, 193); /* perts-pale-red (for ie) */
+    background-color: rgba(224, 130, 130, 0.5); /* perts-pale-red */
+}
+
+.empty-table-hint {
+    text-align: center;
+    font-size: 2em;
+    color: #777; /* gray */
+}
+
+#pagination i {
+    cursor: pointer;
+}
+
+#pagination span {
+    margin: 0 5px;
+    color: #015597; /* perts-dark-blue */
+    cursor: pointer;
+}
+
+#pagination span.active {
+    color: #333; /* dark-gray */
+    cursor: default;
+    font-weight: bold;
+}
+
+
+@media print {
+    #dashboard_fixed_header {
+        display: inherit;
+        margin-top: 0;
+    }
+
+    #dashboard_content {
+        margin-top: 120px;
+    }
+
+    .dashboard-table tbody tr {
+        border-bottom: 1px solid gray;
+    }
+}

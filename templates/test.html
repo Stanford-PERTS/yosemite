@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}
+Automated Testing
+{% endblock %}
+
+{% block header %}
+
+<!-- Styles just for the unit test UI -->
+<style>
+#the_big_win {
+    color: green;
+    font-weight: bolder;
+}
+.failure {
+    border: 1px solid red;
+    background-color: mistyrose;
+    padding: 10px;
+    margin: 10px;
+}
+.failure label {
+    font-weight: bold;
+}
+.failure pre {
+    margin-bottom: 0;
+}
+.run_again {
+    position: relative;
+    float: right;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<!-- angularjs controller for the unit test UI -->
+<!-- displays a list of all of the test methods defined in the unit test -->
+<!-- directory and allow the user to run them from within the browser -->
+<script>
+
+function UnitTestController($scope, $pertsAjax) {
+    // Switches the results pane on and off
+    $scope.displayResults = false;
+    // Array of test names to run, bound to the <select multiple>
+    $scope.testNames = [];
+    // Text to show the user what kind of tests they just ran.
+    $scope.runDescription = "";
+    // Link to the API call that will run the test the user chose.
+    $scope.runLink = '';
+
+    $scope.runSomeTests = function (test_or_tests) {
+        // Convert input (string or array) to array
+        var testNames;
+        if (!(test_or_tests instanceof Array)) {
+            testNames = [test_or_tests];
+            $scope.runDescription = test_or_tests;
+        } else {
+            testNames = test_or_tests;
+            $scope.runDescription = test_or_tests.join(', ');
+        }
+
+        var jsonNames = JSON.stringify(testNames);
+        $scope.runLink = '/unit_test/some?name_json=' + encodeURI(jsonNames);
+
+        $scope.displayResults = false;
+        $pertsAjax({url: $scope.runLink}).then($scope.processResults);
+    };
+
+    $scope.runAllTests = function () {
+        $scope.displayResults = false;
+        $scope.runDescription = 'all tests';
+        $scope.runLink = '/unit_test/all';
+        $pertsAjax({url: $scope.runLink}).then($scope.processResults);
+    };
+
+    $scope.processResults = function (response) {
+        $scope.displayResults = true;
+        // Collapse the overly-detailed output from the server into what
+        // we want to know: if something failed, what failed, and how.
+        forEach(response.unexpected_successes, function (failure) {
+            failure.details = 'test decorated with @unittest.expectedFailure' +
+                              ', yet it succeeds';
+        });
+        $scope.stdout = response.stdout;
+        $scope.failureCount = response.failures.length +
+                              response.unexpected_successes.length +
+                              response.errors.length;
+        $scope.successCount = response.tests_run - $scope.failureCount;
+        $scope.failures = response.failures.concat(
+            response.errors, response.unexpected_successes)
+        $scope.allPassed = response.was_successful;
+    };
+}
+
+</script>
+<fieldset ng-controller="UnitTestController">
+    <legend>Unit Testing</legend>
+    <form>
+        <p>Select which tests to run</p>
+        <button ng-click="runAllTests()">run ALL tests</button>
+        <br>
+        <select multiple ng-model="testNames">
+            <!-- uncomment to view example unit test case, which includes -->
+            <!-- tests that fail -->
+            <!-- <option value="test_example">example</option> -->
+            <option value="test_api_util">api_util</option>
+            <option value="test_cron">cron</option>
+            <option value="test_memcache">memcache</option>
+            <option value="test_pd">pd</option>
+            <option value="test_program_app">program_app</option>
+            <option value="test_qualtrics">qualtrics</option>
+            <option value="test_stratify">stratify</option>
+            <option value="test_systematic_update">systematic_update</option>
+            <option value="test_util">util</option>
+            <!-- add new test files here, omitting the .py extension. -->
+        </select>
+        <button ng-click="runSomeTests(testNames)" ng-disabled="testNames.length == 0">run selected tests</button>
+    </form>
+    <br>
+    <div ng-show="displayResults">
+        <h4>Ran <a href="[[ runLink ]]" target="_blank">[[ runDescription ]]</a></h4>
+        <h4 id="the_big_win" ng-show="allPassed">All tests passed!</h4>
+        <h4 ng-hide="allPassed">Tests passed: <span id="tests_passed">[[ successCount ]]</span></h4>
+        <h4 ng-hide="failureCount == 0">Tests failed:</h4>
+        <div class="failure" ng-repeat="failure in failures">
+            <a href="/unit_test/some?name=[[ failure.test ]]" target="_blank">[[ failure.test ]]</a>
+            <button class="run_again" ng-click="runSomeTests(failure.test)">
+                run again
+            </button>
+            <p>[[ failure.description ]]</p>
+            <pre>[[ failure.details ]]</pre>
+        </div>
+        <h4>Debugging output (stdout from print statements):</h4>
+        <pre>[[ stdout ]]</pre>
+    </div>
+    <pre>[[ test_name | json:'  ' ]]</pre>
+</fieldset>
+
+
+
+
+{% endblock %}
